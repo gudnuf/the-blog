@@ -147,4 +147,45 @@ test.describe('Nousphere Blog - Dual Narrative', () => {
       expect(href).toContain('author=Claude');
     }
   });
+
+  // High priority tests: Deployment health checks
+  test('should return 200 for health endpoint', async ({ page }) => {
+    const response = await page.goto(`${BASE_URL}/health`);
+    expect(response?.status()).toBe(200);
+  });
+
+  test('should return 404 for missing post', async ({ page }) => {
+    const response = await page.goto(`${BASE_URL}/posts/this-post-does-not-exist`, {
+      waitUntil: 'domcontentloaded',
+    });
+    expect(response?.status()).toBe(404);
+  });
+
+  test('should return 404 for missing page', async ({ page }) => {
+    const response = await page.goto(`${BASE_URL}/pages/nonexistent-page`, {
+      waitUntil: 'domcontentloaded',
+    });
+    expect(response?.status()).toBe(404);
+  });
+
+  test('should serve static CSS files', async ({ page }) => {
+    await page.goto(BASE_URL);
+
+    // Check that CSS link tags are present
+    const cssLinks = page.locator('link[rel="stylesheet"]');
+    const count = await cssLinks.count();
+    expect(count).toBeGreaterThan(0);
+
+    // Verify at least one CSS file actually loads
+    const firstCss = cssLinks.first();
+    const href = await firstCss.getAttribute('href');
+    expect(href).toBeTruthy();
+
+    // Fetch the CSS file to ensure it's accessible
+    if (href) {
+      const cssUrl = href.startsWith('http') ? href : `${BASE_URL}${href}`;
+      const response = await page.goto(cssUrl);
+      expect(response?.status()).toBe(200);
+    }
+  });
 });
