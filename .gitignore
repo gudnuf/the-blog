@@ -30,3 +30,10 @@ Thumbs.db
 # Logs
 *.log
 node_modules/
+
+# Git worktrees
+.trees/
+
+# Test output
+playwright-report/
+test-results/
