@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Hero Section -->
+    <section class="text-center py-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to My Blog</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Thoughts on software development, technology, and beyond.
+        </p>
+    </section>
+
+    <!-- Featured Post -->
+    {% if featured_post %}
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex items-center text-sm text-blue-600 mb-2">
+            <span class="font-medium">Featured Post</span>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">
+            <a href="/posts/{{ featured_post.frontmatter.slug }}" class="hover:text-blue-600 transition-colors">
+                {{ featured_post.frontmatter.title }}
+            </a>
+        </h2>
+        <div class="flex items-center text-sm text-gray-500 mb-4">
+            <time datetime="{{ featured_post.frontmatter.date }}">
+                {{ featured_post.frontmatter.date | date_format(format="%B %d, %Y") }}
+            </time>
+            {% if featured_post.frontmatter.author %}
+            <span class="mx-2">&middot;</span>
+            <span>{{ featured_post.frontmatter.author }}</span>
+            {% endif %}
+        </div>
+        {% if featured_post.frontmatter.description %}
+        <p class="text-gray-600 mb-4">{{ featured_post.frontmatter.description }}</p>
+        {% endif %}
+        <a href="/posts/{{ featured_post.frontmatter.slug }}" class="text-blue-600 hover:text-blue-800 font-medium">
+            Read more &rarr;
+        </a>
+    </section>
+    {% endif %}
+
+    <!-- Recent Posts -->
+    <section>
+        <h2 class="text-2xl font-bold mb-6">Recent Posts</h2>
+        {% if posts %}
+        <div class="space-y-6">
+            {% for post in posts %}
+            {% if loop.first and featured_post %}
+            {% continue %}
+            {% endif %}
+            <article class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                <h3 class="text-xl font-semibold mb-2">
+                    <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-blue-600 transition-colors">
+                        {{ post.frontmatter.title }}
+                    </a>
+                </h3>
+                <div class="flex items-center text-sm text-gray-500 mb-3">
+                    <time datetime="{{ post.frontmatter.date }}">
+                        {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
+                    </time>
+                    {% if post.frontmatter.category %}
+                    <span class="mx-2">&middot;</span>
+                    <span class="text-blue-600">{{ post.frontmatter.category }}</span>
+                    {% endif %}
+                </div>
+                {% if post.frontmatter.description %}
+                <p class="text-gray-600">{{ post.frontmatter.description }}</p>
+                {% endif %}
+                {% if post.frontmatter.tags %}
+                <div class="flex flex-wrap gap-2 mt-3">
+                    {% for tag in post.frontmatter.tags %}
+                    <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-600">No posts yet. Check back soon!</p>
+        {% endif %}
+    </section>
+
+    <!-- View All Posts Link -->
+    {% if posts | length > 0 %}
+    <div class="text-center">
+        <a href="/posts" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            View All Posts
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

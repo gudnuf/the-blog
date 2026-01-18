@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ title }}{% endblock %} | My Blog</title>
+    <meta name="description" content="{% block description %}A blog about software development and technology{% endblock %}">
+
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="/static/css/tailwind.css">
+
+    <!-- Syntax highlighting theme overrides -->
+    <style>
+        /* Code block styling */
+        pre {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Inline code */
+        :not(pre) > code {
+            background-color: #f3f4f6;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+
+        .dark :not(pre) > code {
+            background-color: #374151;
+        }
+
+        /* TOC styling */
+        .toc {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .toc-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-item a {
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .toc-item a:hover {
+            color: #3b82f6;
+        }
+
+        .toc-level-3 {
+            padding-left: 1rem;
+        }
+
+        /* HTMX loading indicator */
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+
+        .htmx-request.htmx-indicator {
+            display: inline-block;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+    {% include "partials/header.html" %}
+
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "partials/footer.html" %}
+
+    <!-- HTMX -->
+    <script src="/static/js/htmx.min.js"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

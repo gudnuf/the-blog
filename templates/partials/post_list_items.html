@@ -1,0 +1,32 @@
+{% for post in posts %}
+<article class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+    <h2 class="text-xl font-semibold mb-2">
+        <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-blue-600 transition-colors">
+            {{ post.frontmatter.title }}
+        </a>
+    </h2>
+    <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500 mb-3">
+        <time datetime="{{ post.frontmatter.date }}">
+            {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
+        </time>
+        {% if post.frontmatter.author %}
+        <span>&middot;</span>
+        <span>{{ post.frontmatter.author }}</span>
+        {% endif %}
+        {% if post.frontmatter.category %}
+        <span>&middot;</span>
+        <span class="text-blue-600">{{ post.frontmatter.category }}</span>
+        {% endif %}
+    </div>
+    {% if post.frontmatter.description %}
+    <p class="text-gray-600 mb-3">{{ post.frontmatter.description }}</p>
+    {% endif %}
+    {% if post.frontmatter.tags %}
+    <div class="flex flex-wrap gap-2">
+        {% for tag in post.frontmatter.tags %}
+        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">{{ tag }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+</article>
+{% endfor %}

@@ -1,0 +1,27 @@
+[package]
+name = "blog-content"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Content parsing library for the blog"
+
+[lib]
+name = "blog_content"
+path = "src/lib.rs"
+
+[dependencies]
+pulldown-cmark.workspace = true
+gray_matter.workspace = true
+syntect.workspace = true
+serde.workspace = true
+serde_yaml.workspace = true
+chrono.workspace = true
+thiserror.workspace = true
+walkdir.workspace = true
+once_cell.workspace = true
+html-escape = "0.2"
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

@@ -1,0 +1,25 @@
+[package]
+name = "blog-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "SSR blog server built with Axum"
+
+[[bin]]
+name = "blog-server"
+path = "src/main.rs"
+
+[dependencies]
+blog-content = { path = "../blog-content" }
+
+axum.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+tera.workspace = true
+serde.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+pulldown-cmark.workspace = true
