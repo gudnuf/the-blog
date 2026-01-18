@@ -36,7 +36,7 @@ cargo watch -x run
 
 **Posts** (`content/posts/YYYY-MM-DD-slug.md`):
 - YAML frontmatter with required fields: `title`, `slug`, `date`
-- Optional: `author`, `description`, `tags`, `category`, `draft`, `toc`, `template`, `updated`, `featured_image`
+- Optional: `author`, `description`, `tags`, `category`, `draft`, `toc`, `template`, `updated`, `featured_image`, `related_posts`
 - Sorted by date (newest first), filtered by draft status
 
 **Pages** (`content/pages/slug.md`):
@@ -58,7 +58,7 @@ GET /static/*            -> static assets
 GET /images/*            -> content/images
 ```
 
-**Route Pattern**: State(Arc<AppState>) contains Config + Templates. All handlers return `Result<Html<String>, StatusCode>`.
+**Route Pattern**: State(Arc<AppState>) contains Config, Templates, and post cache. All handlers return `Result<Html<String>, StatusCode>`.
 
 ## Rendering Pipeline
 
@@ -84,6 +84,17 @@ Env-based with defaults (see `blog-server/config.rs`):
 - `RUST_LOG` (info)
 
 **Path Validation**: Config validates paths exist on load, creates content/posts/pages dirs if missing.
+
+## Caching
+
+**Post Cache**: All posts loaded into `Arc<RwLock<Vec<Post>>>` at startup. Pre-filtered for draft status.
+
+**SIGHUP Reload**: Send `SIGHUP` to reload cache without restart:
+```bash
+systemctl reload rust-blog  # or: kill -HUP $(pidof blog-server)
+```
+
+**Dependency**: Uses `parking_lot::RwLock` for efficient concurrent reads.
 
 ## Templates
 
@@ -114,6 +125,8 @@ Tera syntax, base layout pattern:
 **NixOS Module**: Import `nixosModules.default`, configure via `services.rust-blog.*` options.
 
 **Production**: Binary expects content at configured paths. Use rsync to deploy content, systemctl to manage service.
+
+**Scripts**: `scripts/deploy-content.sh` rsyncs content and triggers SIGHUP reload.
 
 ## Code Patterns
 
