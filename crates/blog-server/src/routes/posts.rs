@@ -8,8 +8,6 @@ use axum::{
     response::Html,
 };
 use blog_content::{
-    load_all_posts,
-    parser::load_post_by_slug,
     Post, RenderedContent,
     highlighter::highlight_code,
     toc::{extract_toc, render_toc},
@@ -48,17 +46,8 @@ async fn render_post_list(
     page: usize,
     partial: bool,
 ) -> Result<Html<String>, StatusCode> {
-    let all_posts = load_all_posts(&state.config.content_path)
-        .map_err(|e| {
-            tracing::error!("Failed to load posts: {}", e);
-            StatusCode::INTERNAL_SERVER_ERROR
-        })?;
-
-    // Filter drafts
-    let all_posts: Vec<_> = all_posts
-        .into_iter()
-        .filter(|p| state.config.enable_drafts || !p.is_draft())
-        .collect();
+    // Load from cache (already filtered by draft status)
+    let all_posts = state.post_cache.read().clone();
 
     let per_page = state.config.posts_per_page;
     let total_pages = (all_posts.len() + per_page - 1) / per_page;
@@ -107,16 +96,13 @@ pub async fn show(
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    let post = load_post_by_slug(&slug, &state.config.content_path)
-        .map_err(|e| {
-            tracing::warn!("Post not found: {} - {}", slug, e);
-            StatusCode::NOT_FOUND
-        })?;
-
-    // Check draft status
-    if post.is_draft() && !state.config.enable_drafts {
-        return Err(StatusCode::NOT_FOUND);
-    }
+    // Find post in cache (already filtered by draft status)
+    let posts = state.post_cache.read();
+    let post = posts
+        .iter()
+        .find(|p| p.slug() == slug)
+        .ok_or(StatusCode::NOT_FOUND)?
+        .clone();
 
     let rendered = render_post_content(&post);
 

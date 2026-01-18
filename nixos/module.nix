@@ -109,6 +109,7 @@ in
         User = cfg.user;
         Group = cfg.group;
         ExecStart = "${cfg.package}/bin/blog-server";
+        ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         Restart = "on-failure";
         RestartSec = 5;
 

@@ -5,6 +5,7 @@ mod routes;
 mod templates;
 
 use std::net::SocketAddr;
+use std::path::Path;
 use std::sync::Arc;
 
 use axum::{
@@ -20,11 +21,31 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::config::Config;
 use crate::templates::Templates;
+use blog_content::Post;
+use parking_lot::RwLock;
 
 /// Application state shared across handlers
 pub struct AppState {
     pub config: Config,
     pub templates: Templates,
+    pub post_cache: Arc<RwLock<Vec<Post>>>,
+}
+
+/// Load all posts into memory cache
+fn load_posts_into_cache(
+    content_path: &Path,
+    enable_drafts: bool,
+) -> Result<Vec<Post>, blog_content::ContentError> {
+    let all_posts = blog_content::load_all_posts(content_path)?;
+
+    // Pre-filter drafts during cache load
+    let posts: Vec<_> = all_posts
+        .into_iter()
+        .filter(|p| enable_drafts || !p.is_draft())
+        .collect();
+
+    tracing::info!("Loaded {} posts into cache", posts.len());
+    Ok(posts)
 }
 
 #[tokio::main]
@@ -46,8 +67,16 @@ async fn main() -> anyhow::Result<()> {
     let templates = Templates::new(&config.templates_path)?;
     tracing::info!("Templates loaded from {:?}", config.templates_path);
 
+    // Initialize post cache
+    let initial_posts = load_posts_into_cache(&config.content_path, config.enable_drafts)?;
+    let post_cache = Arc::new(RwLock::new(initial_posts));
+
     // Create shared state
-    let state = Arc::new(AppState { config: config.clone(), templates });
+    let state = Arc::new(AppState {
+        config: config.clone(),
+        templates,
+        post_cache,
+    });
 
     // Build router
     let app = Router::new()
@@ -61,7 +90,10 @@ async fn main() -> anyhow::Result<()> {
         .nest_service("/images", ServeDir::new(config.content_path.join("images")))
         .layer(CompressionLayer::new())
         .layer(TraceLayer::new_for_http())
-        .with_state(state);
+        .with_state(state.clone());
+
+    // Spawn SIGHUP handler for cache reload
+    spawn_sighup_handler(state);
 
     // Start server
     let addr = SocketAddr::new(config.host.parse()?, config.port);
@@ -101,4 +133,43 @@ async fn shutdown_signal() {
     }
 
     tracing::info!("Shutdown signal received");
+}
+
+/// Spawn a task to handle SIGHUP signals for cache reload
+fn spawn_sighup_handler(state: Arc<AppState>) {
+    #[cfg(unix)]
+    {
+        tokio::spawn(async move {
+            use tokio::signal::unix::{signal, SignalKind};
+
+            let mut sighup = match signal(SignalKind::hangup()) {
+                Ok(s) => s,
+                Err(e) => {
+                    tracing::error!("Failed to install SIGHUP handler: {}", e);
+                    return;
+                }
+            };
+
+            tracing::info!("SIGHUP handler installed");
+
+            loop {
+                sighup.recv().await;
+                tracing::info!("SIGHUP received, reloading post cache");
+
+                match load_posts_into_cache(&state.config.content_path, state.config.enable_drafts) {
+                    Ok(new_posts) => {
+                        *state.post_cache.write() = new_posts;
+                        tracing::info!("Post cache reloaded successfully");
+                    }
+                    Err(e) => {
+                        tracing::error!("Failed to reload post cache: {}", e);
+                        // Keep old cache on error
+                    }
+                }
+            }
+        });
+    }
+
+    #[cfg(not(unix))]
+    tracing::warn!("SIGHUP handler not available on non-Unix systems");
 }

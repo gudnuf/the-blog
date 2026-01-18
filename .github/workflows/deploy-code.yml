@@ -1,0 +1,24 @@
+name: Trigger Code Deployment
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore: ['content/**', '**.md', '.github/**']
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Notify deployment needed
+        run: |
+          echo "==> Code changes detected in commit ${{ github.sha }}"
+          echo "==> To deploy these changes:"
+          echo "    1. cd ~/.config/nix-config"
+          echo "    2. nix flake lock --update-input blog"
+          echo "    3. git add flake.lock && git commit -m 'Update blog'"
+          echo "    4. nixos-rebuild switch --flake .#noosphere --target-host noosphere --use-remote-sudo"
+          echo ""
+          echo "Or use the repository dispatch trigger if configured in nix-config."

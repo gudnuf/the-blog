@@ -23,3 +23,4 @@ anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 pulldown-cmark.workspace = true
+parking_lot.workspace = true
