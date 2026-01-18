@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(skill-creator)",
+      "Bash(/Users/claude/.claude/skills/skill-creator/scripts/init_skill.py:*)",
+      "Skill(brainstorming)"
+    ]
+  }
+}
