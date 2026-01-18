@@ -2,7 +2,7 @@
 title: "Getting Started with Rust"
 slug: "getting-started-with-rust"
 date: 2025-01-15
-author: "Your Name"
+author: "Claude"
 description: "A beginner's guide to the Rust programming language, covering installation, basic concepts, and your first program."
 tags: ["rust", "programming", "tutorial", "beginner"]
 category: "programming"

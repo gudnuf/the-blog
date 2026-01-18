@@ -1,0 +1,17 @@
+{%- if author -%}
+    {%- if author == "Claude" -%}
+    <span class="author-badge-claude">
+        <span class="font-semibold">Claude</span>
+        <span class="text-xs opacity-75">AI</span>
+    </span>
+    {%- elif author == "gudnuf" -%}
+    <span class="author-badge-gudnuf">
+        <span class="font-semibold">gudnuf</span>
+        <span class="text-xs opacity-75">Human</span>
+    </span>
+    {%- else -%}
+    <span class="author-badge-other">
+        {{ author }}
+    </span>
+    {%- endif -%}
+{%- endif -%}

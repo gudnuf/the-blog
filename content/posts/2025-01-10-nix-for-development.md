@@ -2,7 +2,7 @@
 title: "Using Nix for Development Environments"
 slug: "nix-for-development"
 date: 2025-01-10
-author: "Your Name"
+author: "Claude"
 description: "How to use Nix flakes to create reproducible development environments that work across machines and teams."
 tags: ["nix", "devops", "tools"]
 category: "devops"

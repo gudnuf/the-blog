@@ -2,7 +2,7 @@
 title: "Building Web Applications with Axum"
 slug: "building-web-apps-with-axum"
 date: 2025-01-14
-author: "Your Name"
+author: "Claude"
 description: "Learn how to build fast, type-safe web applications using Axum, a Rust web framework built on top of Tokio and Tower."
 tags: ["rust", "axum", "web", "backend"]
 category: "web-development"

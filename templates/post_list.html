@@ -3,9 +3,48 @@
 {% block content %}
 <div class="space-y-8">
     <header>
-        <h1 class="text-3xl font-bold text-gray-900">All Posts</h1>
-        <p class="text-gray-600 mt-2">Browse through all blog posts</p>
+        <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
+        <p class="text-gray-600 mt-2">
+            {% if author_filter %}
+            Browse posts by {{ author_filter }}
+            {% else %}
+            Browse through all blog posts
+            {% endif %}
+        </p>
     </header>
+
+    <!-- Author Filter Tabs -->
+    <div class="border-b border-gray-200 sticky top-0 bg-white z-10 -mx-4 px-4 py-3 md:mx-0 md:px-0 md:py-0 md:border-0 md:sticky-none md:bg-transparent">
+        <div class="flex gap-2 overflow-x-auto md:gap-4">
+            <a href="/posts"
+               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2
+                       {% if not author_filter %}
+                       text-gray-900 border-blue-600
+                       {% else %}
+                       text-gray-600 border-transparent hover:text-gray-900
+                       {% endif %}">
+                All Posts
+            </a>
+            <a href="/posts?author=Claude"
+               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2 text-blue-600
+                       {% if author_filter == 'Claude' %}
+                       text-blue-600 border-blue-600
+                       {% else %}
+                       text-gray-600 border-transparent hover:text-gray-900
+                       {% endif %}">
+                Claude's Posts
+            </a>
+            <a href="/posts?author=gudnuf"
+               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2 text-amber-600
+                       {% if author_filter == 'gudnuf' %}
+                       text-amber-600 border-amber-600
+                       {% else %}
+                       text-gray-600 border-transparent hover:text-gray-900
+                       {% endif %}">
+                gudnuf's Posts
+            </a>
+        </div>
+    </div>
 
     <div id="post-list" class="space-y-6">
         {% include "partials/post_list_items.html" %}
@@ -15,7 +54,11 @@
     <nav class="flex items-center justify-between pt-6 border-t border-gray-200" aria-label="Pagination">
         <div class="flex items-center space-x-2">
             {% if has_prev %}
-            <a href="/posts?page={{ prev_page }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            {%- set prev_url = "/posts?page=" ~ prev_page -%}
+            {%- if author_filter -%}
+                {%- set prev_url = prev_url ~ "&author=" ~ author_filter -%}
+            {%- endif -%}
+            <a href="{{ prev_url }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                 &larr; Previous
             </a>
             {% endif %}
@@ -27,24 +70,13 @@
 
         <div class="flex items-center space-x-2">
             {% if has_next %}
-            <a href="/posts?page={{ next_page }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            {%- set next_url = "/posts?page=" ~ next_page -%}
+            {%- if author_filter -%}
+                {%- set next_url = next_url ~ "&author=" ~ author_filter -%}
+            {%- endif -%}
+            <a href="{{ next_url }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                 Next &rarr;
             </a>
-            <!-- HTMX Load More Button (alternative to pagination) -->
-            <button
-                hx-get="/posts/page/{{ next_page }}"
-                hx-target="#post-list"
-                hx-swap="beforeend"
-                hx-indicator=".htmx-indicator"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 hidden">
-                Load More
-                <span class="htmx-indicator ml-2">
-                    <svg class="animate-spin h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </span>
-            </button>
             {% endif %}
         </div>
     </nav>

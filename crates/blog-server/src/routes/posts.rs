@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use axum::{
     extract::{Path, Query, State},
-    http::{StatusCode, HeaderMap},
+    http::StatusCode,
     response::Html,
 };
 use blog_content::{
@@ -13,51 +13,65 @@ use blog_content::{
     toc::{extract_toc, render_toc},
 };
 use pulldown_cmark::{CodeBlockKind, CowStr, Event, Options, Parser, Tag, TagEnd};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 
 #[derive(Deserialize)]
 pub struct ListQuery {
     pub page: Option<usize>,
+    pub author: Option<String>,
 }
 
-/// List posts with pagination
+/// Data structure for related posts that can be serialized to Tera
+#[derive(Serialize, Debug, Clone)]
+pub struct RelatedPostData {
+    pub post: Post,
+    pub label: String,
+}
+
+/// List posts with pagination and optional author filtering
 pub async fn list(
     State(state): State<Arc<AppState>>,
     Query(query): Query<ListQuery>,
 ) -> Result<Html<String>, StatusCode> {
     let page = query.page.unwrap_or(1).max(1);
-    render_post_list(state, page, false).await
-}
-
-/// List posts for a specific page (HTMX partial)
-pub async fn list_page(
-    State(state): State<Arc<AppState>>,
-    Path(page): Path<usize>,
-    headers: HeaderMap,
-) -> Result<Html<String>, StatusCode> {
-    let is_htmx = headers.contains_key("hx-request");
-    render_post_list(state, page.max(1), is_htmx).await
+    render_post_list(state, page, query.author).await
 }
 
 async fn render_post_list(
     state: Arc<AppState>,
     page: usize,
-    partial: bool,
+    author: Option<String>,
 ) -> Result<Html<String>, StatusCode> {
     // Load from cache (already filtered by draft status)
     let all_posts = state.post_cache.read().clone();
 
+    // Filter by author if provided
+    let filtered_posts: Vec<_> = if let Some(ref author_filter) = author {
+        all_posts
+            .into_iter()
+            .filter(|p| p.author().map(|a| a == author_filter).unwrap_or(false))
+            .collect()
+    } else {
+        all_posts
+    };
+
     let per_page = state.config.posts_per_page;
-    let total_pages = (all_posts.len() + per_page - 1) / per_page;
+    let total_pages = (filtered_posts.len() + per_page - 1) / per_page;
     let skip = (page - 1) * per_page;
 
-    let posts: Vec<_> = all_posts
+    let posts: Vec<_> = filtered_posts
         .into_iter()
         .skip(skip)
         .take(per_page)
         .collect();
+
+    let title = if let Some(ref a) = author {
+        format!("{}'s Posts", a)
+    } else {
+        "All Posts".to_string()
+    };
 
     let mut context = tera::Context::new();
     context.insert("posts", &posts);
@@ -67,17 +81,12 @@ async fn render_post_list(
     context.insert("has_prev", &(page > 1));
     context.insert("next_page", &(page + 1));
     context.insert("prev_page", &(page - 1));
-    context.insert("title", "All Posts");
-
-    let template = if partial {
-        "partials/post_list_items.html"
-    } else {
-        "post_list.html"
-    };
+    context.insert("title", &title);
+    context.insert("author_filter", &author);
 
     let html = state
         .templates
-        .render(template, &context)
+        .render("post_list.html", &context)
         .map_err(|e| {
             tracing::error!("Failed to render template: {}", e);
             StatusCode::INTERNAL_SERVER_ERROR
@@ -106,10 +115,29 @@ pub async fn show(
 
     let rendered = render_post_content(&post);
 
+    // Find related posts: explicitly related + similar by tags
+    let explicit_related: Vec<RelatedPostData> = post
+        .related_posts()
+        .iter()
+        .filter_map(|rel| {
+            posts
+                .iter()
+                .find(|p| p.slug() == rel.slug)
+                .map(|p| RelatedPostData {
+                    post: p.clone(),
+                    label: rel.relationship.label().to_string(),
+                })
+        })
+        .collect();
+
+    let similar_by_tags = post.similar_posts_by_tags(&posts, 3);
+
     let mut context = tera::Context::new();
     context.insert("post", &post);
     context.insert("content", &rendered.html);
     context.insert("title", post.title());
+    context.insert("explicit_related", &explicit_related);
+    context.insert("similar_by_tags", &similar_by_tags);
 
     if let Some(ref toc_html) = rendered.toc {
         context.insert("toc", toc_html);
@@ -122,7 +150,7 @@ pub async fn show(
         .templates
         .render("post.html", &context)
         .map_err(|e| {
-            tracing::error!("Failed to render template: {}", e);
+            tracing::error!("Failed to render template: {} - Details: {:?}", e, e);
             StatusCode::INTERNAL_SERVER_ERROR
         })?;
 

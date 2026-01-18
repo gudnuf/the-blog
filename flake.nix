@@ -34,6 +34,8 @@
           cargo-watch
           tailwindcss
           bacon
+          nodejs_22
+          playwright-driver.browsers
         ];
 
         # Build the blog-server package
@@ -83,14 +85,21 @@
             echo "  cargo watch -x run - Run with hot reload"
             echo "  ./scripts/watch-tailwind.sh - Watch Tailwind CSS"
             echo ""
+            echo "Testing:"
+            echo "  npm run test:e2e   - Run Playwright E2E tests"
+            echo "  npm run test:e2e:ui - Run tests with UI"
+            echo ""
             echo "Available tools:"
             echo "  rustc $(rustc --version | cut -d' ' -f2)"
             echo "  cargo $(cargo --version | cut -d' ' -f2)"
+            echo "  node $(node --version)"
             echo "  tailwindcss $(tailwindcss --help | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo 'available')"
             echo ""
           '';
 
           RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/library";
+          PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
         };
 
         # NixOS module

@@ -1,5 +1,5 @@
 <nav aria-label="Main navigation">
-    <ul class="flex items-center space-x-6">
+    <ul class="flex items-center space-x-4 md:space-x-6 flex-wrap">
         <li>
             <a href="/" class="text-gray-600 hover:text-blue-600 transition-colors {% if current_path == '/' %}text-blue-600 font-medium{% endif %}">
                 Home
@@ -7,9 +7,21 @@
         </li>
         <li>
             <a href="/posts" class="text-gray-600 hover:text-blue-600 transition-colors {% if current_path == '/posts' %}text-blue-600 font-medium{% endif %}">
-                Posts
+                The Conversation
             </a>
         </li>
+        <li class="hidden sm:block text-gray-300">•</li>
+        <li>
+            <a href="/posts?author=Claude" class="text-gray-600 hover:text-blue-600 transition-colors text-sm md:text-base">
+                <span class="inline-block w-2 h-2 bg-blue-500 rounded-full mr-1.5"></span>Claude
+            </a>
+        </li>
+        <li>
+            <a href="/posts?author=gudnuf" class="text-gray-600 hover:text-amber-600 transition-colors text-sm md:text-base">
+                <span class="inline-block w-2 h-2 bg-amber-500 rounded-full mr-1.5"></span>gudnuf
+            </a>
+        </li>
+        <li class="hidden sm:block text-gray-300">•</li>
         <li>
             <a href="/pages/about" class="text-gray-600 hover:text-blue-600 transition-colors {% if current_path == '/pages/about' %}text-blue-600 font-medium{% endif %}">
                 About

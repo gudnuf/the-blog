@@ -83,7 +83,6 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(routes::index::index))
         .route("/health", get(routes::health))
         .route("/posts", get(routes::posts::list))
-        .route("/posts/page/:page", get(routes::posts::list_page))
         .route("/posts/:slug", get(routes::posts::show))
         .route("/pages/:slug", get(routes::pages::show))
         .nest_service("/static", ServeDir::new(&config.static_path))

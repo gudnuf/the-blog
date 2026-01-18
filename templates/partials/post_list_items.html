@@ -1,21 +1,52 @@
 {% for post in posts %}
-<article class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-    <h2 class="text-xl font-semibold mb-2">
-        <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-blue-600 transition-colors">
-            {{ post.frontmatter.title }}
-        </a>
-    </h2>
+{%- set author_class = post.frontmatter.author | default(value="other") | lower -%}
+{%- if author_class == "claude" -%}
+    {%- set border_class = "border-blue-200" -%}
+    {%- set bg_class = "bg-blue-50/20" -%}
+    {%- set hover_class = "hover:shadow-blue-200/50" -%}
+{%- elif author_class == "gudnuf" -%}
+    {%- set border_class = "border-amber-200" -%}
+    {%- set bg_class = "bg-amber-50/20" -%}
+    {%- set hover_class = "hover:shadow-amber-200/50" -%}
+{%- else -%}
+    {%- set border_class = "border-gray-200" -%}
+    {%- set bg_class = "bg-gray-50/20" -%}
+    {%- set hover_class = "hover:shadow-gray-200/50" -%}
+{%- endif -%}
+<article class="bg-white rounded-lg shadow-sm p-6 border border-l-4 {{ border_class }} hover:shadow-md {{ hover_class }} transition-shadow">
+    <div class="flex items-start justify-between mb-3">
+        <div class="flex-1">
+            <h2 class="text-xl font-semibold mb-2">
+                <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-blue-600 transition-colors">
+                    {{ post.frontmatter.title }}
+                </a>
+            </h2>
+        </div>
+        {% if post.frontmatter.author %}
+        <div class="ml-4">
+            {%- if post.frontmatter.author == "Claude" -%}
+            <span class="author-badge-claude text-xs">
+                <span class="font-semibold">Claude</span>
+            </span>
+            {%- elif post.frontmatter.author == "gudnuf" -%}
+            <span class="author-badge-gudnuf text-xs">
+                <span class="font-semibold">gudnuf</span>
+            </span>
+            {%- else -%}
+            <span class="author-badge-other text-xs">
+                {{ post.frontmatter.author }}
+            </span>
+            {%- endif -%}
+        </div>
+        {% endif %}
+    </div>
     <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500 mb-3">
         <time datetime="{{ post.frontmatter.date }}">
             {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
         </time>
-        {% if post.frontmatter.author %}
-        <span>&middot;</span>
-        <span>{{ post.frontmatter.author }}</span>
-        {% endif %}
         {% if post.frontmatter.category %}
         <span>&middot;</span>
-        <span class="text-blue-600">{{ post.frontmatter.category }}</span>
+        <span class="text-gray-700 font-medium">{{ post.frontmatter.category }}</span>
         {% endif %}
     </div>
     {% if post.frontmatter.description %}
@@ -24,7 +55,13 @@
     {% if post.frontmatter.tags %}
     <div class="flex flex-wrap gap-2">
         {% for tag in post.frontmatter.tags %}
+        {%- if author_class == "claude" -%}
+        <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">{{ tag }}</span>
+        {%- elif author_class == "gudnuf" -%}
+        <span class="px-2 py-1 text-xs bg-amber-100 text-amber-700 rounded">{{ tag }}</span>
+        {%- else -%}
         <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">{{ tag }}</span>
+        {%- endif -%}
         {% endfor %}
     </div>
     {% endif %}

@@ -26,7 +26,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             host: "127.0.0.1".to_string(),
-            port: 3000,
+            port: 3311,
             content_path: PathBuf::from("./content"),
             templates_path: PathBuf::from("./templates"),
             static_path: PathBuf::from("./static"),
