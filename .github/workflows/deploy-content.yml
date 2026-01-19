@@ -1,14 +1,19 @@
 name: Deploy Content
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
     branches: [main, master]
-    paths: ['content/**']
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event_name == 'workflow_dispatch' ||
+       contains(toJSON(github.event.workflow_run.head_commit.modified), 'content/'))
     steps:
       - uses: actions/checkout@v4
 

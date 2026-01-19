@@ -1,14 +1,21 @@
 name: Trigger Code Deployment
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
     branches: [main, master]
-    paths-ignore: ['content/**', '**.md', '.github/**']
   workflow_dispatch:
 
 jobs:
   notify:
     runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (!contains(toJSON(github.event.workflow_run.head_commit.modified), 'content/') &&
+        !contains(toJSON(github.event.workflow_run.head_commit.modified), '.md') &&
+        !contains(toJSON(github.event.workflow_run.head_commit.modified), '.github/')))
     steps:
       - uses: actions/checkout@v4
 
