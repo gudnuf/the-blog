@@ -17,7 +17,7 @@ jobs:
         !contains(toJSON(github.event.workflow_run.head_commit.modified), '.md') &&
         !contains(toJSON(github.event.workflow_run.head_commit.modified), '.github/')))
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Notify deployment needed
         run: |
