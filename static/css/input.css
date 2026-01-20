@@ -85,17 +85,20 @@
     @apply border-l-2 border-gray-200 pl-4;
   }
 
-  /* Mobile TOC chevron rotation */
-  details[open] .details-chevron {
-    @apply rotate-180;
+  /* Mobile TOC drawer */
+  .toc-drawer-content .toc-list {
+    @apply space-y-2;
   }
 
-  details summary::-webkit-details-marker {
-    @apply hidden;
+  .toc-drawer-content .toc-item a {
+    @apply text-base py-2 text-gray-700 hover:text-blue-600;
   }
 
-  details summary::marker {
-    @apply hidden;
-    content: "";
+  .toc-drawer-content .toc-level-3 {
+    @apply pl-5 border-l-2 border-gray-100;
+  }
+
+  .toc-drawer-content .toc-level-3 a {
+    @apply text-sm text-gray-500;
   }
 }

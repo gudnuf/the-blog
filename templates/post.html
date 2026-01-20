@@ -59,24 +59,96 @@
         {% endif %}
     </header>
 
-    <!-- Mobile TOC (collapsible) -->
+    <!-- Mobile TOC Floating Button + Drawer -->
     {% if has_toc %}
-    <details class="lg:hidden mb-8 border border-gray-200 rounded-lg bg-gray-50">
-        <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-gray-700 select-none">
-            <span class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h12"></path>
-                </svg>
-                Table of Contents
-            </span>
-            <svg class="w-5 h-5 transition-transform details-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    <div id="toc-mobile-container" class="lg:hidden">
+        <!-- Backdrop -->
+        <div id="toc-backdrop" class="fixed inset-0 bg-black/50 z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+        <!-- Floating Button -->
+        <button id="toc-fab"
+                class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+                aria-label="Table of Contents"
+                aria-expanded="false">
+            <svg class="w-6 h-6 toc-icon-menu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h12"></path>
             </svg>
-        </summary>
-        <div class="px-4 pb-4 toc-mobile">
-            {{ toc | safe }}
+            <svg class="w-6 h-6 toc-icon-close hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- Drawer -->
+        <div id="toc-drawer"
+             class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[70vh] flex flex-col">
+            <!-- Drawer Handle -->
+            <div class="flex justify-center pt-3 pb-2">
+                <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+            </div>
+            <!-- Drawer Header -->
+            <div class="flex items-center justify-between px-6 pb-3 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-900">Contents</h2>
+                <button id="toc-close" class="p-2 -mr-2 text-gray-400 hover:text-gray-600" aria-label="Close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Drawer Content -->
+            <div class="overflow-y-auto px-6 py-4 toc-drawer-content">
+                {{ toc | safe }}
+            </div>
         </div>
-    </details>
+    </div>
+
+    <script>
+    (function() {
+        const fab = document.getElementById('toc-fab');
+        const drawer = document.getElementById('toc-drawer');
+        const backdrop = document.getElementById('toc-backdrop');
+        const closeBtn = document.getElementById('toc-close');
+        const menuIcon = fab.querySelector('.toc-icon-menu');
+        const closeIcon = fab.querySelector('.toc-icon-close');
+
+        function openDrawer() {
+            drawer.classList.remove('translate-y-full');
+            backdrop.classList.remove('opacity-0', 'pointer-events-none');
+            menuIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+            fab.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            drawer.classList.add('translate-y-full');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+            fab.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        fab.addEventListener('click', function() {
+            const isOpen = fab.getAttribute('aria-expanded') === 'true';
+            isOpen ? closeDrawer() : openDrawer();
+        });
+
+        closeBtn.addEventListener('click', closeDrawer);
+        backdrop.addEventListener('click', closeDrawer);
+
+        // Close on TOC link click
+        drawer.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', closeDrawer);
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && fab.getAttribute('aria-expanded') === 'true') {
+                closeDrawer();
+            }
+        });
+    })();
+    </script>
     {% endif %}
 
     <!-- Content with optional TOC sidebar -->
