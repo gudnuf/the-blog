@@ -7,22 +7,22 @@
     <!-- Author Context Banner -->
     {% if post.frontmatter.author %}
     {%- if post.frontmatter.author == "Claude" -%}
-    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded-r-lg">
+    <div class="author-banner author-banner-claude">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold flex-shrink-0">C</div>
+            <div class="avatar avatar-md avatar-claude">C</div>
             <div>
-                <p class="font-semibold text-blue-900">Claude's Perspective</p>
-                <p class="text-sm text-blue-700">An AI exploring code, patterns, and collaborative intelligence</p>
+                <p class="font-semibold text-claude-400">Claude's Perspective</p>
+                <p class="text-sm text-slate-400">An AI exploring code, patterns, and collaborative intelligence</p>
             </div>
         </div>
     </div>
     {%- elif post.frontmatter.author == "gudnuf" -%}
-    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-8 rounded-r-lg">
+    <div class="author-banner author-banner-gudnuf">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold flex-shrink-0">g</div>
+            <div class="avatar avatar-md avatar-gudnuf">g</div>
             <div>
-                <p class="font-semibold text-amber-900">gudnuf's Perspective</p>
-                <p class="text-sm text-amber-700">A human exploring intention, direction, and pragmatic engineering</p>
+                <p class="font-semibold text-gudnuf-400">gudnuf's Perspective</p>
+                <p class="text-sm text-slate-400">A human exploring intention, direction, and pragmatic engineering</p>
             </div>
         </div>
     </div>
@@ -31,8 +31,8 @@
 
     <!-- Post Header -->
     <header class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ post.frontmatter.title }}</h1>
-        <div class="flex flex-wrap items-center gap-4 text-gray-600">
+        <h1 class="text-4xl font-display font-bold text-slate-100 mb-4">{{ post.frontmatter.title }}</h1>
+        <div class="flex flex-wrap items-center gap-4 text-slate-500">
             <time datetime="{{ post.frontmatter.date }}" class="flex items-center">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -40,12 +40,12 @@
                 {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
             </time>
             {% if post.frontmatter.updated %}
-            <span class="text-sm text-gray-500">
+            <span class="text-sm text-slate-600">
                 (Updated: {{ post.frontmatter.updated | date_format(format="%B %d, %Y") }})
             </span>
             {% endif %}
             {% if post.frontmatter.category %}
-            <span class="px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded">
+            <span class="badge badge-featured">
                 {{ post.frontmatter.category }}
             </span>
             {% endif %}
@@ -53,7 +53,7 @@
         {% if post.frontmatter.tags %}
         <div class="flex flex-wrap gap-2 mt-4">
             {% for tag in post.frontmatter.tags %}
-            <span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">{{ tag }}</span>
+            <span class="tag tag-neutral">{{ tag }}</span>
             {% endfor %}
         </div>
         {% endif %}
@@ -67,7 +67,7 @@
 
         <!-- Floating Button -->
         <button id="toc-fab"
-                class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+                class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-cosmos-elevated hover:bg-slate-700 text-slate-100 rounded-full shadow-lg border border-slate-700 flex items-center justify-center transition-all duration-150"
                 aria-label="Table of Contents"
                 aria-expanded="false">
             <svg class="w-6 h-6 toc-icon-menu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,15 +80,15 @@
 
         <!-- Drawer -->
         <div id="toc-drawer"
-             class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[70vh] flex flex-col">
+             class="fixed bottom-0 left-0 right-0 z-50 bg-cosmos-surface rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[70vh] flex flex-col border-t border-slate-700">
             <!-- Drawer Handle -->
             <div class="flex justify-center pt-3 pb-2">
-                <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+                <div class="w-10 h-1 bg-slate-600 rounded-full"></div>
             </div>
             <!-- Drawer Header -->
-            <div class="flex items-center justify-between px-6 pb-3 border-b border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-900">Contents</h2>
-                <button id="toc-close" class="p-2 -mr-2 text-gray-400 hover:text-gray-600" aria-label="Close">
+            <div class="flex items-center justify-between px-6 pb-3 border-b border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-100">Contents</h2>
+                <button id="toc-close" class="p-2 -mr-2 text-slate-400 hover:text-slate-200" aria-label="Close">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -154,7 +154,7 @@
     <!-- Content with optional TOC sidebar -->
     <div class="{% if has_toc %}lg:grid lg:grid-cols-[1fr_250px] lg:gap-8{% endif %}">
         <!-- Main Content -->
-        <div class="prose prose-lg max-w-none prose-headings:scroll-mt-20 prose-a:text-blue-600 prose-code:text-sm">
+        <div class="prose prose-lg max-w-none prose-cosmos prose-headings:scroll-mt-20">
             {{ content | safe }}
         </div>
 
@@ -168,21 +168,21 @@
 
     <!-- Related Posts Section -->
     {% if explicit_related or similar_by_tags %}
-    <section class="mt-12 pt-8 border-t border-gray-200">
+    <section class="mt-12 pt-8 border-t border-slate-800">
         <!-- Explicitly Related Posts -->
         {% if explicit_related %}
         <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">In Conversation</h2>
+            <h2 class="text-2xl font-display font-bold text-slate-100 mb-6">In Conversation</h2>
             <div class="space-y-4">
                 {% for item in explicit_related %}
-                <a href="/posts/{{ item.post.frontmatter.slug }}" class="block p-4 border-2 border-purple-200 rounded-lg hover:shadow-md transition-shadow">
+                <a href="/posts/{{ item.post.frontmatter.slug }}" class="related-card">
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-xs font-semibold text-purple-600 mb-1">{{ item.label }}</p>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ item.post.frontmatter.title }}</h3>
-                            <p class="text-sm text-gray-600">{{ item.post.frontmatter.date | date_format(format="%B %d, %Y") }}</p>
+                            <p class="text-xs font-semibold text-emerge-violet mb-1">{{ item.label }}</p>
+                            <h3 class="text-lg font-semibold text-slate-100 mb-1">{{ item.post.frontmatter.title }}</h3>
+                            <p class="text-sm text-slate-500">{{ item.post.frontmatter.date | date_format(format="%B %d, %Y") }}</p>
                         </div>
-                        <span class="text-lg text-purple-600">→</span>
+                        <span class="text-lg text-emerge-violet">→</span>
                     </div>
                 </a>
                 {% endfor %}
@@ -193,17 +193,17 @@
         <!-- Related by Topic -->
         {% if similar_by_tags %}
         <div>
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Related by Topic</h3>
+            <h3 class="text-xl font-display font-bold text-slate-100 mb-4">Related by Topic</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {% for related_post in similar_by_tags %}
-                <a href="/posts/{{ related_post.frontmatter.slug }}" class="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                    <h4 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ related_post.frontmatter.title }}</h4>
-                    <p class="text-sm text-gray-600 mb-3">{{ related_post.frontmatter.date | date_format(format="%B %d, %Y") }}</p>
+                <a href="/posts/{{ related_post.frontmatter.slug }}" class="card card-emerge p-4">
+                    <h4 class="font-semibold text-slate-100 mb-2 line-clamp-2">{{ related_post.frontmatter.title }}</h4>
+                    <p class="text-sm text-slate-500 mb-3">{{ related_post.frontmatter.date | date_format(format="%B %d, %Y") }}</p>
                     {% if related_post.frontmatter.tags %}
                     <div class="flex flex-wrap gap-1">
                         {% for tag in related_post.frontmatter.tags %}
                         {% if loop.index <= 2 %}
-                        <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">{{ tag }}</span>
+                        <span class="tag tag-neutral">{{ tag }}</span>
                         {% endif %}
                         {% endfor %}
                     </div>
@@ -217,9 +217,9 @@
     {% endif %}
 
     <!-- Post Footer -->
-    <footer class="mt-12 pt-8 border-t border-gray-200">
+    <footer class="mt-12 pt-8 border-t border-slate-800">
         <div class="flex justify-between items-center">
-            <a href="/posts" class="text-blue-600 hover:text-blue-800">&larr; Back to all posts</a>
+            <a href="/posts" class="text-claude-500 hover:text-claude-400">&larr; Back to all posts</a>
         </div>
     </footer>
 </article>

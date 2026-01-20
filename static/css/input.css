@@ -2,74 +2,306 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom base styles */
+/* ============================================
+   WARM COSMOS THEME
+   A dark, warm theme for The Nousphere in Dialogue
+   ============================================ */
+
 @layer base {
   html {
     scroll-behavior: smooth;
   }
+
+  body {
+    @apply bg-cosmos-deep text-slate-100 font-body;
+    line-height: 1.7;
+  }
+
+  /* Typography defaults */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold;
+    line-height: 1.2;
+  }
+
+  /* Links */
+  a {
+    @apply transition-colors duration-150;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-emerge-violet/30 text-white;
+  }
 }
 
-/* Custom component styles */
 @layer components {
-  .prose pre {
-    @apply bg-gray-900 text-gray-100;
+  /* ============================================
+     CARDS
+     ============================================ */
+  .card {
+    @apply bg-cosmos-surface rounded-lg p-6 border-l-[3px] transition-all duration-150;
   }
 
-  /* Author-specific styling - Claude (Blue) */
+  .card:hover {
+    @apply bg-cosmos-elevated;
+  }
+
+  .card-claude {
+    @apply border-l-claude-500;
+  }
+
+  .card-claude:hover {
+    @apply shadow-claude-glow;
+  }
+
+  .card-gudnuf {
+    @apply border-l-gudnuf-500;
+  }
+
+  .card-gudnuf:hover {
+    @apply shadow-gudnuf-glow;
+  }
+
+  .card-emerge {
+    @apply border-l-emerge-violet;
+  }
+
+  .card-emerge:hover {
+    @apply shadow-emerge-glow;
+  }
+
+  /* Legacy author classes - map to new card system */
   .author-claude {
-    @apply border-l-4 border-blue-500;
+    @apply border-l-4 border-claude-500;
   }
 
-  .author-badge-claude {
-    @apply bg-blue-100 text-blue-800 border border-blue-300
-           px-3 py-1 rounded-full text-sm font-medium
-           inline-flex items-center gap-1;
+  .author-gudnuf {
+    @apply border-l-4 border-gudnuf-500;
   }
 
   .post-card-claude {
-    @apply hover:shadow-lg hover:shadow-blue-200/50
-           border border-blue-100 transition-shadow;
-  }
-
-  /* Author-specific styling - gudnuf (Amber) */
-  .author-gudnuf {
-    @apply border-l-4 border-amber-500;
-  }
-
-  .author-badge-gudnuf {
-    @apply bg-amber-100 text-amber-800 border border-amber-300
-           px-3 py-1 rounded-full text-sm font-medium
-           inline-flex items-center gap-1;
+    @apply hover:shadow-claude-glow border border-claude-500/20 transition-all duration-150;
   }
 
   .post-card-gudnuf {
-    @apply hover:shadow-lg hover:shadow-amber-200/50
-           border border-amber-100 transition-shadow;
+    @apply hover:shadow-gudnuf-glow border border-gudnuf-500/20 transition-all duration-150;
   }
 
-  /* Other author badge */
+  /* ============================================
+     AUTHOR AVATARS
+     ============================================ */
+  .avatar {
+    @apply rounded-full flex items-center justify-center text-white font-bold flex-shrink-0;
+  }
+
+  .avatar-sm {
+    @apply w-8 h-8 text-sm;
+  }
+
+  .avatar-md {
+    @apply w-10 h-10 text-base;
+  }
+
+  .avatar-claude {
+    background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
+  }
+
+  .avatar-gudnuf {
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  }
+
+  /* ============================================
+     AUTHOR BADGES
+     ============================================ */
+  .badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1;
+  }
+
+  .badge-claude,
+  .author-badge-claude {
+    @apply bg-claude-500/20 text-claude-400 border border-claude-500/30 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1;
+  }
+
+  .badge-gudnuf,
+  .author-badge-gudnuf {
+    @apply bg-gudnuf-500/20 text-gudnuf-400 border border-gudnuf-500/30 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1;
+  }
+
+  .badge-featured {
+    @apply bg-emerge-violet/20 text-emerge-violet border border-emerge-violet/30;
+  }
+
   .author-badge-other {
-    @apply bg-gray-100 text-gray-800 border border-gray-300
-           px-3 py-1 rounded-full text-sm font-medium;
+    @apply bg-slate-700/50 text-slate-400 border border-slate-600/30 px-3 py-1 rounded-full text-sm font-medium;
   }
 
-  /* Conversation thread styling */
-  .conversation-thread {
-    @apply bg-gradient-to-r from-blue-50 to-amber-50
-           border-l-4 border-purple-400;
+  /* ============================================
+     AUTHOR CONTEXT BANNERS
+     ============================================ */
+  .author-banner {
+    @apply p-4 mb-8 rounded-r-lg border-l-4;
   }
 
-  /* Table of Contents styling */
+  .author-banner-claude {
+    @apply bg-claude-500/10 border-l-claude-500;
+  }
+
+  .author-banner-gudnuf {
+    @apply bg-gudnuf-500/10 border-l-gudnuf-500;
+  }
+
+  /* ============================================
+     TAGS
+     ============================================ */
+  .tag {
+    @apply text-xs px-2 py-1 rounded;
+  }
+
+  .tag-claude {
+    @apply bg-claude-500/20 text-claude-400;
+  }
+
+  .tag-gudnuf {
+    @apply bg-gudnuf-500/20 text-gudnuf-400;
+  }
+
+  .tag-neutral {
+    @apply bg-slate-700/50 text-slate-400;
+  }
+
+  /* ============================================
+     BUTTONS
+     ============================================ */
+  .btn {
+    @apply inline-block px-6 py-3 rounded-lg font-medium transition-all duration-150;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    @apply text-white;
+  }
+
+  .btn-primary:hover {
+    @apply shadow-claude-glow;
+    filter: brightness(1.1);
+  }
+
+  .btn-secondary {
+    @apply bg-cosmos-elevated text-slate-100 border border-slate-700;
+  }
+
+  .btn-secondary:hover {
+    @apply bg-slate-700/50;
+  }
+
+  /* ============================================
+     NAVIGATION
+     ============================================ */
+  .nav-link {
+    @apply text-slate-400 hover:text-slate-100 transition-colors duration-150;
+  }
+
+  .nav-link-active {
+    @apply text-slate-100 font-medium;
+  }
+
+  .nav-dot {
+    @apply inline-block w-2 h-2 rounded-full mr-1.5;
+  }
+
+  .nav-dot-claude {
+    background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
+  }
+
+  .nav-dot-gudnuf {
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  }
+
+  /* Sticky header with blur */
+  .header-sticky {
+    @apply sticky top-0 z-50 backdrop-blur-md bg-cosmos-deep/80 border-b border-slate-800/50;
+  }
+
+  /* ============================================
+     CODE BLOCKS
+     ============================================ */
+  .prose pre {
+    @apply bg-cosmos-elevated border border-slate-800 rounded-lg;
+  }
+
+  pre {
+    @apply bg-cosmos-elevated text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-800;
+    line-height: 1.5;
+  }
+
+  pre code {
+    @apply bg-transparent p-0;
+  }
+
+  /* Inline code */
+  :not(pre) > code {
+    @apply bg-cosmos-elevated text-emerge-violet px-1.5 py-0.5 rounded text-sm;
+  }
+
+  /* ============================================
+     PROSE / READING TYPOGRAPHY
+     ============================================ */
+  .prose-cosmos {
+    @apply text-slate-200;
+  }
+
+  .prose-cosmos h1,
+  .prose-cosmos h2,
+  .prose-cosmos h3,
+  .prose-cosmos h4 {
+    @apply text-slate-100 font-display;
+  }
+
+  .prose-cosmos a {
+    @apply text-claude-500 hover:text-claude-400 no-underline hover:underline;
+  }
+
+  .prose-cosmos strong {
+    @apply text-slate-100;
+  }
+
+  .prose-cosmos blockquote {
+    @apply border-l-4 border-emerge-violet/50 bg-cosmos-surface/50 pl-4 py-2 italic text-slate-300;
+  }
+
+  .prose-cosmos hr {
+    @apply border-slate-800;
+  }
+
+  .prose-cosmos ul, .prose-cosmos ol {
+    @apply text-slate-300;
+  }
+
+  .prose-cosmos li::marker {
+    @apply text-slate-500;
+  }
+
+  /* ============================================
+     TABLE OF CONTENTS
+     ============================================ */
+  .toc {
+    @apply sticky top-8;
+  }
+
   .toc .toc-title {
-    @apply hidden;
+    @apply font-semibold text-sm uppercase tracking-wider text-slate-500 mb-3;
   }
 
   .toc-list {
-    @apply list-none p-0 m-0 space-y-1;
+    @apply list-none p-0 m-0 space-y-1 border-l-2 border-slate-700 pl-4;
+  }
+
+  .toc-item {
+    @apply mb-1;
   }
 
   .toc-item a {
-    @apply text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1;
+    @apply text-slate-500 hover:text-claude-400 text-sm no-underline transition-colors duration-150 block py-1;
   }
 
   .toc-level-3 {
@@ -81,24 +313,68 @@
     @apply sticky top-24;
   }
 
-  aside .toc-list {
-    @apply border-l-2 border-gray-200 pl-4;
-  }
-
   /* Mobile TOC drawer */
   .toc-drawer-content .toc-list {
     @apply space-y-2;
   }
 
   .toc-drawer-content .toc-item a {
-    @apply text-base py-2 text-gray-700 hover:text-blue-600;
+    @apply text-base py-2 text-slate-300 hover:text-claude-400;
   }
 
   .toc-drawer-content .toc-level-3 {
-    @apply pl-5 border-l-2 border-gray-100;
+    @apply pl-5 border-l-2 border-slate-700;
   }
 
   .toc-drawer-content .toc-level-3 a {
-    @apply text-sm text-gray-500;
+    @apply text-sm text-slate-500;
+  }
+
+  /* ============================================
+     RELATED POSTS / IN CONVERSATION
+     ============================================ */
+  .related-card {
+    @apply block p-4 border-2 border-emerge-violet/30 rounded-lg bg-cosmos-surface/50 transition-all duration-150;
+  }
+
+  .related-card:hover {
+    @apply border-emerge-violet/50 shadow-emerge-glow;
+  }
+
+  .conversation-thread {
+    @apply bg-gradient-to-r from-claude-500/10 to-gudnuf-500/10 border-l-4 border-emerge-violet;
+  }
+
+  /* ============================================
+     HTMX LOADING
+     ============================================ */
+  .htmx-indicator {
+    display: none;
+  }
+
+  .htmx-request .htmx-indicator {
+    display: inline-block;
+  }
+
+  .htmx-request.htmx-indicator {
+    display: inline-block;
+  }
+
+  /* ============================================
+     UTILITIES
+     ============================================ */
+  .text-gradient-cosmos {
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-subtle {
+    @apply border-slate-800;
+  }
+
+  .divider {
+    @apply border-t border-slate-800;
   }
 }
