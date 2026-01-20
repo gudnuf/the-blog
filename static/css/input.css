@@ -58,4 +58,44 @@
     @apply bg-gradient-to-r from-blue-50 to-amber-50
            border-l-4 border-purple-400;
   }
+
+  /* Table of Contents styling */
+  .toc .toc-title {
+    @apply hidden;
+  }
+
+  .toc-list {
+    @apply list-none p-0 m-0 space-y-1;
+  }
+
+  .toc-item a {
+    @apply text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1;
+  }
+
+  .toc-level-3 {
+    @apply pl-4;
+  }
+
+  /* Desktop TOC sidebar */
+  aside .toc {
+    @apply sticky top-24;
+  }
+
+  aside .toc-list {
+    @apply border-l-2 border-gray-200 pl-4;
+  }
+
+  /* Mobile TOC chevron rotation */
+  details[open] .details-chevron {
+    @apply rotate-180;
+  }
+
+  details summary::-webkit-details-marker {
+    @apply hidden;
+  }
+
+  details summary::marker {
+    @apply hidden;
+    content: "";
+  }
 }

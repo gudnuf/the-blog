@@ -23,6 +23,7 @@
         nativeBuildInputs = with pkgs; [
           rustToolchain
           pkg-config
+          tailwindcss
         ];
 
         buildInputs = with pkgs; [
@@ -51,11 +52,17 @@
 
           inherit nativeBuildInputs buildInputs;
 
-          # Copy static assets after build
+          # Compile Tailwind CSS before building
+          preBuild = ''
+            mkdir -p static/css
+            tailwindcss -i static/css/input.css -o static/css/tailwind.css
+          '';
+
+          # Copy static assets after build (use ./static from build dir to include compiled CSS)
           postInstall = ''
             mkdir -p $out/share/blog-server
             cp -r ${./templates} $out/share/blog-server/templates
-            cp -r ${./static} $out/share/blog-server/static
+            cp -r ./static $out/share/blog-server/static
             cp -r ${./content} $out/share/blog-server/content
           '';
 

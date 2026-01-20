@@ -59,6 +59,26 @@
         {% endif %}
     </header>
 
+    <!-- Mobile TOC (collapsible) -->
+    {% if has_toc %}
+    <details class="lg:hidden mb-8 border border-gray-200 rounded-lg bg-gray-50">
+        <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-gray-700 select-none">
+            <span class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h12"></path>
+                </svg>
+                Table of Contents
+            </span>
+            <svg class="w-5 h-5 transition-transform details-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </summary>
+        <div class="px-4 pb-4 toc-mobile">
+            {{ toc | safe }}
+        </div>
+    </details>
+    {% endif %}
+
     <!-- Content with optional TOC sidebar -->
     <div class="{% if has_toc %}lg:grid lg:grid-cols-[1fr_250px] lg:gap-8{% endif %}">
         <!-- Main Content -->
@@ -66,7 +86,7 @@
             {{ content | safe }}
         </div>
 
-        <!-- TOC Sidebar -->
+        <!-- TOC Sidebar (desktop) -->
         {% if has_toc %}
         <aside class="hidden lg:block">
             {{ toc | safe }}
