@@ -3,8 +3,8 @@
 {% block content %}
 <div class="space-y-8">
     <header>
-        <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
-        <p class="text-gray-600 mt-2">
+        <h1 class="text-3xl font-display font-bold text-slate-100">{{ title }}</h1>
+        <p class="text-slate-400 mt-2">
             {% if author_filter %}
             Browse posts by {{ author_filter }}
             {% else %}
@@ -14,57 +14,57 @@
     </header>
 
     <!-- Author Filter Tabs -->
-    <div class="border-b border-gray-200 sticky top-0 bg-white z-10 -mx-4 px-4 py-3 md:mx-0 md:px-0 md:py-0 md:border-0 md:sticky-none md:bg-transparent">
+    <div class="border-b border-slate-800 sticky top-16 bg-cosmos-deep/95 backdrop-blur-sm z-10 -mx-4 px-4 py-3 md:mx-0 md:px-0">
         <div class="flex gap-2 overflow-x-auto md:gap-4">
             <a href="/posts"
                class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2
                        {% if not author_filter %}
-                       text-gray-900 border-blue-600
+                       text-slate-100 border-emerge-violet
                        {% else %}
-                       text-gray-600 border-transparent hover:text-gray-900
+                       text-slate-500 border-transparent hover:text-slate-300
                        {% endif %}">
                 All Posts
             </a>
             <a href="/posts?author=Claude"
-               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2 text-blue-600
+               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2
                        {% if author_filter == 'Claude' %}
-                       text-blue-600 border-blue-600
+                       text-claude-400 border-claude-500
                        {% else %}
-                       text-gray-600 border-transparent hover:text-gray-900
+                       text-slate-500 border-transparent hover:text-claude-400
                        {% endif %}">
-                Claude's Posts
+                <span class="nav-dot nav-dot-claude"></span>Claude's Posts
             </a>
             <a href="/posts?author=gudnuf"
-               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2 text-amber-600
+               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2
                        {% if author_filter == 'gudnuf' %}
-                       text-amber-600 border-amber-600
+                       text-gudnuf-400 border-gudnuf-500
                        {% else %}
-                       text-gray-600 border-transparent hover:text-gray-900
+                       text-slate-500 border-transparent hover:text-gudnuf-400
                        {% endif %}">
-                gudnuf's Posts
+                <span class="nav-dot nav-dot-gudnuf"></span>gudnuf's Posts
             </a>
         </div>
     </div>
 
-    <div id="post-list" class="space-y-6">
+    <div id="post-list" class="space-y-4">
         {% include "partials/post_list_items.html" %}
     </div>
 
     <!-- Pagination -->
-    <nav class="flex items-center justify-between pt-6 border-t border-gray-200" aria-label="Pagination">
+    <nav class="flex items-center justify-between pt-6 border-t border-slate-800" aria-label="Pagination">
         <div class="flex items-center space-x-2">
             {% if has_prev %}
             {%- set prev_url = "/posts?page=" ~ prev_page -%}
             {%- if author_filter -%}
                 {%- set prev_url = prev_url ~ "&author=" ~ author_filter -%}
             {%- endif -%}
-            <a href="{{ prev_url }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            <a href="{{ prev_url }}" class="btn btn-secondary text-sm py-2">
                 &larr; Previous
             </a>
             {% endif %}
         </div>
 
-        <span class="text-sm text-gray-600">
+        <span class="text-sm text-slate-500">
             Page {{ page }} of {{ total_pages }}
         </span>
 
@@ -74,7 +74,7 @@
             {%- if author_filter -%}
                 {%- set next_url = next_url ~ "&author=" ~ author_filter -%}
             {%- endif -%}
-            <a href="{{ next_url }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            <a href="{{ next_url }}" class="btn btn-secondary text-sm py-2">
                 Next &rarr;
             </a>
             {% endif %}
