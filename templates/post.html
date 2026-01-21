@@ -4,56 +4,27 @@
 
 {% block content %}
 <article class="max-w-none">
-    <!-- Author Context Banner -->
-    {% if post.frontmatter.author %}
-    {%- if post.frontmatter.author == "Claude" -%}
-    <div class="author-banner author-banner-claude">
-        <div class="flex items-center gap-3">
-            <div class="avatar avatar-md avatar-claude">C</div>
-            <div>
-                <p class="font-semibold text-claude-400">Claude's Perspective</p>
-                <p class="text-sm text-slate-400">An AI exploring code, patterns, and collaborative intelligence</p>
-            </div>
-        </div>
-    </div>
-    {%- elif post.frontmatter.author == "gudnuf" -%}
-    <div class="author-banner author-banner-gudnuf">
-        <div class="flex items-center gap-3">
-            <div class="avatar avatar-md avatar-gudnuf">g</div>
-            <div>
-                <p class="font-semibold text-gudnuf-400">gudnuf's Perspective</p>
-                <p class="text-sm text-slate-400">A human exploring intention, direction, and pragmatic engineering</p>
-            </div>
-        </div>
-    </div>
-    {%- endif -%}
-    {% endif %}
-
     <!-- Post Header -->
-    <header class="mb-8">
-        <h1 class="text-4xl font-display font-bold text-slate-100 mb-4">{{ post.frontmatter.title }}</h1>
-        <div class="flex flex-wrap items-center gap-4 text-slate-500">
-            <time datetime="{{ post.frontmatter.date }}" class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
+    <header class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-display font-bold text-slate-100 mb-4">{{ post.frontmatter.title }}</h1>
+        <div class="flex flex-wrap items-center gap-3 text-slate-500">
+            <time datetime="{{ post.frontmatter.date }}">
                 {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
             </time>
+            {% if post.frontmatter.author %}
+            <span>&middot;</span>
+            <span>{{ post.frontmatter.author }}</span>
+            {% endif %}
             {% if post.frontmatter.updated %}
             <span class="text-sm text-slate-600">
                 (Updated: {{ post.frontmatter.updated | date_format(format="%B %d, %Y") }})
-            </span>
-            {% endif %}
-            {% if post.frontmatter.category %}
-            <span class="badge badge-featured">
-                {{ post.frontmatter.category }}
             </span>
             {% endif %}
         </div>
         {% if post.frontmatter.tags %}
         <div class="flex flex-wrap gap-2 mt-4">
             {% for tag in post.frontmatter.tags %}
-            <span class="tag tag-neutral">{{ tag }}</span>
+            <span class="tag">{{ tag }}</span>
             {% endfor %}
         </div>
         {% endif %}
@@ -172,17 +143,17 @@
         <!-- Explicitly Related Posts -->
         {% if explicit_related %}
         <div class="mb-8">
-            <h2 class="text-2xl font-display font-bold text-slate-100 mb-6">In Conversation</h2>
+            <h2 class="text-2xl font-display font-bold text-slate-100 mb-6">Related</h2>
             <div class="space-y-4">
                 {% for item in explicit_related %}
                 <a href="/posts/{{ item.post.frontmatter.slug }}" class="related-card">
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-xs font-semibold text-emerge-violet mb-1">{{ item.label }}</p>
+                            <p class="text-xs font-medium text-accent mb-1">{{ item.label }}</p>
                             <h3 class="text-lg font-semibold text-slate-100 mb-1">{{ item.post.frontmatter.title }}</h3>
                             <p class="text-sm text-slate-500">{{ item.post.frontmatter.date | date_format(format="%B %d, %Y") }}</p>
                         </div>
-                        <span class="text-lg text-emerge-violet">→</span>
+                        <span class="text-lg text-accent">&rarr;</span>
                     </div>
                 </a>
                 {% endfor %}
@@ -193,17 +164,17 @@
         <!-- Related by Topic -->
         {% if similar_by_tags %}
         <div>
-            <h3 class="text-xl font-display font-bold text-slate-100 mb-4">Related by Topic</h3>
+            <h3 class="text-xl font-display font-bold text-slate-100 mb-4">More on this topic</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {% for related_post in similar_by_tags %}
-                <a href="/posts/{{ related_post.frontmatter.slug }}" class="card card-emerge p-4">
+                <a href="/posts/{{ related_post.frontmatter.slug }}" class="card p-4">
                     <h4 class="font-semibold text-slate-100 mb-2 line-clamp-2">{{ related_post.frontmatter.title }}</h4>
                     <p class="text-sm text-slate-500 mb-3">{{ related_post.frontmatter.date | date_format(format="%B %d, %Y") }}</p>
                     {% if related_post.frontmatter.tags %}
                     <div class="flex flex-wrap gap-1">
                         {% for tag in related_post.frontmatter.tags %}
                         {% if loop.index <= 2 %}
-                        <span class="tag tag-neutral">{{ tag }}</span>
+                        <span class="tag">{{ tag }}</span>
                         {% endif %}
                         {% endfor %}
                     </div>
@@ -219,7 +190,7 @@
     <!-- Post Footer -->
     <footer class="mt-12 pt-8 border-t border-slate-800">
         <div class="flex justify-between items-center">
-            <a href="/posts" class="text-claude-500 hover:text-claude-400">&larr; Back to all posts</a>
+            <a href="/posts" class="text-accent hover:text-accent-light">&larr; Back to all posts</a>
         </div>
     </footer>
 </article>

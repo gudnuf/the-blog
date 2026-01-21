@@ -1,52 +1,17 @@
 {% for post in posts %}
-{%- set author_class = post.frontmatter.author | default(value="other") | lower -%}
-{%- if author_class == "claude" -%}
-    {%- set card_class = "card-claude" -%}
-    {%- set tag_class = "tag-claude" -%}
-    {%- set hover_color = "hover:text-claude-400" -%}
-{%- elif author_class == "gudnuf" -%}
-    {%- set card_class = "card-gudnuf" -%}
-    {%- set tag_class = "tag-gudnuf" -%}
-    {%- set hover_color = "hover:text-gudnuf-400" -%}
-{%- else -%}
-    {%- set card_class = "card-emerge" -%}
-    {%- set tag_class = "tag-neutral" -%}
-    {%- set hover_color = "hover:text-emerge-violet" -%}
-{%- endif -%}
-<article class="card {{ card_class }} p-5">
-    <div class="flex items-start justify-between mb-3">
-        <div class="flex-1">
-            <h2 class="text-xl font-semibold mb-2 text-slate-100">
-                <a href="/posts/{{ post.frontmatter.slug }}" class="{{ hover_color }} transition-colors">
-                    {{ post.frontmatter.title }}
-                </a>
-            </h2>
-        </div>
-        {% if post.frontmatter.author %}
-        <div class="ml-4">
-            {%- if post.frontmatter.author == "Claude" -%}
-            <span class="badge-claude text-xs">
-                <span class="font-semibold">Claude</span>
-            </span>
-            {%- elif post.frontmatter.author == "gudnuf" -%}
-            <span class="badge-gudnuf text-xs">
-                <span class="font-semibold">gudnuf</span>
-            </span>
-            {%- else -%}
-            <span class="author-badge-other text-xs">
-                {{ post.frontmatter.author }}
-            </span>
-            {%- endif -%}
-        </div>
-        {% endif %}
-    </div>
+<article class="card p-5">
+    <h2 class="text-xl font-semibold mb-2 text-slate-100">
+        <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-accent transition-colors">
+            {{ post.frontmatter.title }}
+        </a>
+    </h2>
     <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-3">
         <time datetime="{{ post.frontmatter.date }}">
             {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
         </time>
-        {% if post.frontmatter.category %}
+        {% if post.frontmatter.author %}
         <span>&middot;</span>
-        <span class="text-slate-400 font-medium">{{ post.frontmatter.category }}</span>
+        <span>{{ post.frontmatter.author }}</span>
         {% endif %}
     </div>
     {% if post.frontmatter.description %}
@@ -55,7 +20,7 @@
     {% if post.frontmatter.tags %}
     <div class="flex flex-wrap gap-2">
         {% for tag in post.frontmatter.tags %}
-        <span class="tag {{ tag_class }}">{{ tag }}</span>
+        <span class="tag">{{ tag }}</span>
         {% endfor %}
     </div>
     {% endif %}

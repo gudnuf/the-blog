@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /* ============================================
-   WARM COSMOS THEME
-   A dark, warm theme for The Nousphere in Dialogue
+   REFINED MINIMAL THEME
+   Clean, content-focused design
    ============================================ */
 
 @layer base {
@@ -13,13 +13,13 @@
   }
 
   body {
-    @apply bg-cosmos-deep text-slate-100 font-body;
-    line-height: 1.7;
+    @apply bg-cosmos-deep text-slate-300 font-body;
+    line-height: 1.6;
   }
 
   /* Typography defaults */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold;
+    @apply font-display font-semibold text-slate-100;
     line-height: 1.2;
   }
 
@@ -30,160 +30,42 @@
 
   /* Selection */
   ::selection {
-    @apply bg-emerge-violet/30 text-white;
+    @apply bg-accent/30 text-white;
   }
 }
 
 @layer components {
   /* ============================================
-     CARDS
+     CARDS - Simplified
      ============================================ */
   .card {
-    @apply bg-cosmos-surface rounded-lg p-6 border-l-[3px] transition-all duration-150;
+    @apply bg-cosmos-surface rounded-lg p-6 border border-slate-800/50 transition-all duration-150;
   }
 
   .card:hover {
-    @apply bg-cosmos-elevated;
-  }
-
-  .card-claude {
-    @apply border-l-claude-500;
-  }
-
-  .card-claude:hover {
-    @apply shadow-claude-glow;
-  }
-
-  .card-gudnuf {
-    @apply border-l-gudnuf-500;
-  }
-
-  .card-gudnuf:hover {
-    @apply shadow-gudnuf-glow;
-  }
-
-  .card-emerge {
-    @apply border-l-emerge-violet;
-  }
-
-  .card-emerge:hover {
-    @apply shadow-emerge-glow;
-  }
-
-  /* Legacy author classes - map to new card system */
-  .author-claude {
-    @apply border-l-4 border-claude-500;
-  }
-
-  .author-gudnuf {
-    @apply border-l-4 border-gudnuf-500;
-  }
-
-  .post-card-claude {
-    @apply hover:shadow-claude-glow border border-claude-500/20 transition-all duration-150;
-  }
-
-  .post-card-gudnuf {
-    @apply hover:shadow-gudnuf-glow border border-gudnuf-500/20 transition-all duration-150;
+    @apply bg-cosmos-elevated border-slate-700/50;
   }
 
   /* ============================================
-     AUTHOR AVATARS
-     ============================================ */
-  .avatar {
-    @apply rounded-full flex items-center justify-center text-white font-bold flex-shrink-0;
-  }
-
-  .avatar-sm {
-    @apply w-8 h-8 text-sm;
-  }
-
-  .avatar-md {
-    @apply w-10 h-10 text-base;
-  }
-
-  .avatar-claude {
-    background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
-  }
-
-  .avatar-gudnuf {
-    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
-  }
-
-  /* ============================================
-     AUTHOR BADGES
-     ============================================ */
-  .badge {
-    @apply px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1;
-  }
-
-  .badge-claude,
-  .author-badge-claude {
-    @apply bg-claude-500/20 text-claude-400 border border-claude-500/30 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1;
-  }
-
-  .badge-gudnuf,
-  .author-badge-gudnuf {
-    @apply bg-gudnuf-500/20 text-gudnuf-400 border border-gudnuf-500/30 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1;
-  }
-
-  .badge-featured {
-    @apply bg-emerge-violet/20 text-emerge-violet border border-emerge-violet/30;
-  }
-
-  .author-badge-other {
-    @apply bg-slate-700/50 text-slate-400 border border-slate-600/30 px-3 py-1 rounded-full text-sm font-medium;
-  }
-
-  /* ============================================
-     AUTHOR CONTEXT BANNERS
-     ============================================ */
-  .author-banner {
-    @apply p-4 mb-8 rounded-r-lg border-l-4;
-  }
-
-  .author-banner-claude {
-    @apply bg-claude-500/10 border-l-claude-500;
-  }
-
-  .author-banner-gudnuf {
-    @apply bg-gudnuf-500/10 border-l-gudnuf-500;
-  }
-
-  /* ============================================
-     TAGS
+     TAGS - Single style
      ============================================ */
   .tag {
-    @apply text-xs px-2 py-1 rounded;
-  }
-
-  .tag-claude {
-    @apply bg-claude-500/20 text-claude-400;
-  }
-
-  .tag-gudnuf {
-    @apply bg-gudnuf-500/20 text-gudnuf-400;
-  }
-
-  .tag-neutral {
-    @apply bg-slate-700/50 text-slate-400;
+    @apply text-xs px-2 py-1 rounded bg-slate-800/50 text-slate-400;
   }
 
   /* ============================================
-     BUTTONS
+     BUTTONS - Simplified
      ============================================ */
   .btn {
     @apply inline-block px-6 py-3 rounded-lg font-medium transition-all duration-150;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-    @apply text-white;
+    @apply bg-accent text-cosmos-deep;
   }
 
   .btn-primary:hover {
-    @apply shadow-claude-glow;
-    filter: brightness(1.1);
+    @apply bg-accent-light;
   }
 
   .btn-secondary {
@@ -191,11 +73,11 @@
   }
 
   .btn-secondary:hover {
-    @apply bg-slate-700/50;
+    @apply bg-slate-700/50 border-slate-600;
   }
 
   /* ============================================
-     NAVIGATION
+     NAVIGATION - Cleaner
      ============================================ */
   .nav-link {
     @apply text-slate-400 hover:text-slate-100 transition-colors duration-150;
@@ -203,18 +85,6 @@
 
   .nav-link-active {
     @apply text-slate-100 font-medium;
-  }
-
-  .nav-dot {
-    @apply inline-block w-2 h-2 rounded-full mr-1.5;
-  }
-
-  .nav-dot-claude {
-    background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
-  }
-
-  .nav-dot-gudnuf {
-    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
   }
 
   /* Sticky header with blur */
@@ -225,10 +95,6 @@
   /* ============================================
      CODE BLOCKS
      ============================================ */
-  .prose pre {
-    @apply bg-cosmos-elevated border border-slate-800 rounded-lg;
-  }
-
   pre {
     @apply bg-cosmos-elevated text-slate-100 p-4 rounded-lg overflow-x-auto text-sm border border-slate-800;
     line-height: 1.5;
@@ -238,16 +104,22 @@
     @apply bg-transparent p-0;
   }
 
-  /* Inline code */
+  /* Inline code - simpler */
   :not(pre) > code {
-    @apply bg-cosmos-elevated text-emerge-violet px-1.5 py-0.5 rounded text-sm;
+    @apply bg-cosmos-elevated text-slate-200 px-1.5 py-0.5 rounded text-sm;
   }
 
   /* ============================================
      PROSE / READING TYPOGRAPHY
      ============================================ */
   .prose-cosmos {
-    @apply text-slate-200;
+    @apply text-slate-300;
+    font-size: 18px;
+    line-height: 1.65;
+  }
+
+  .prose-cosmos > * + * {
+    margin-top: 1.25em;
   }
 
   .prose-cosmos h1,
@@ -255,10 +127,17 @@
   .prose-cosmos h3,
   .prose-cosmos h4 {
     @apply text-slate-100 font-display;
+    margin-top: 2em;
+    margin-bottom: 0.75em;
   }
 
+  .prose-cosmos h1 { @apply text-4xl; }
+  .prose-cosmos h2 { @apply text-2xl; }
+  .prose-cosmos h3 { @apply text-xl; }
+  .prose-cosmos h4 { @apply text-lg; }
+
   .prose-cosmos a {
-    @apply text-claude-500 hover:text-claude-400 no-underline hover:underline;
+    @apply text-accent-light underline hover:text-accent;
   }
 
   .prose-cosmos strong {
@@ -266,19 +145,35 @@
   }
 
   .prose-cosmos blockquote {
-    @apply border-l-4 border-emerge-violet/50 bg-cosmos-surface/50 pl-4 py-2 italic text-slate-300;
+    @apply border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400;
   }
 
   .prose-cosmos hr {
-    @apply border-slate-800;
+    @apply border-slate-800 my-8;
   }
 
   .prose-cosmos ul, .prose-cosmos ol {
-    @apply text-slate-300;
+    @apply text-slate-300 pl-6;
+  }
+
+  .prose-cosmos ul {
+    @apply list-disc;
+  }
+
+  .prose-cosmos ol {
+    @apply list-decimal;
+  }
+
+  .prose-cosmos li {
+    @apply mb-2;
   }
 
   .prose-cosmos li::marker {
     @apply text-slate-500;
+  }
+
+  .prose-cosmos img {
+    @apply rounded-lg;
   }
 
   /* ============================================
@@ -293,7 +188,7 @@
   }
 
   .toc-list {
-    @apply list-none p-0 m-0 space-y-1 border-l-2 border-slate-700 pl-4;
+    @apply list-none p-0 m-0 space-y-1 border-l border-slate-800 pl-4;
   }
 
   .toc-item {
@@ -301,7 +196,7 @@
   }
 
   .toc-item a {
-    @apply text-slate-500 hover:text-claude-400 text-sm no-underline transition-colors duration-150 block py-1;
+    @apply text-slate-500 hover:text-accent text-sm no-underline transition-colors duration-150 block py-1;
   }
 
   .toc-level-3 {
@@ -319,11 +214,11 @@
   }
 
   .toc-drawer-content .toc-item a {
-    @apply text-base py-2 text-slate-300 hover:text-claude-400;
+    @apply text-base py-2 text-slate-300 hover:text-accent;
   }
 
   .toc-drawer-content .toc-level-3 {
-    @apply pl-5 border-l-2 border-slate-700;
+    @apply pl-5 border-l border-slate-700;
   }
 
   .toc-drawer-content .toc-level-3 a {
@@ -331,18 +226,14 @@
   }
 
   /* ============================================
-     RELATED POSTS / IN CONVERSATION
+     RELATED POSTS
      ============================================ */
   .related-card {
-    @apply block p-4 border-2 border-emerge-violet/30 rounded-lg bg-cosmos-surface/50 transition-all duration-150;
+    @apply block p-4 border border-slate-800 rounded-lg bg-cosmos-surface/50 transition-all duration-150;
   }
 
   .related-card:hover {
-    @apply border-emerge-violet/50 shadow-emerge-glow;
-  }
-
-  .conversation-thread {
-    @apply bg-gradient-to-r from-claude-500/10 to-gudnuf-500/10 border-l-4 border-emerge-violet;
+    @apply border-slate-700 bg-cosmos-elevated;
   }
 
   /* ============================================
@@ -363,18 +254,16 @@
   /* ============================================
      UTILITIES
      ============================================ */
-  .text-gradient-cosmos {
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #fbbf24 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
   .border-subtle {
     @apply border-slate-800;
   }
 
   .divider {
     @apply border-t border-slate-800;
+  }
+
+  /* Author text - subtle indicator */
+  .author-text {
+    @apply text-slate-500 text-sm;
   }
 }

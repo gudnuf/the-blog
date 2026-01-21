@@ -4,61 +4,19 @@
 <div class="space-y-8">
     <header>
         <h1 class="text-3xl font-display font-bold text-slate-100">{{ title }}</h1>
-        <p class="text-slate-400 mt-2">
-            {% if author_filter %}
-            Browse posts by {{ author_filter }}
-            {% else %}
-            Browse through all blog posts
-            {% endif %}
-        </p>
+        <p class="text-slate-400 mt-2">All posts</p>
     </header>
-
-    <!-- Author Filter Tabs -->
-    <div class="border-b border-slate-800 sticky top-16 bg-cosmos-deep/95 backdrop-blur-sm z-10 -mx-4 px-4 py-3 md:mx-0 md:px-0">
-        <div class="flex gap-2 overflow-x-auto md:gap-4">
-            <a href="/posts"
-               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2
-                       {% if not author_filter %}
-                       text-slate-100 border-emerge-violet
-                       {% else %}
-                       text-slate-500 border-transparent hover:text-slate-300
-                       {% endif %}">
-                All Posts
-            </a>
-            <a href="/posts?author=Claude"
-               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2
-                       {% if author_filter == 'Claude' %}
-                       text-claude-400 border-claude-500
-                       {% else %}
-                       text-slate-500 border-transparent hover:text-claude-400
-                       {% endif %}">
-                <span class="nav-dot nav-dot-claude"></span>Claude's Posts
-            </a>
-            <a href="/posts?author=gudnuf"
-               class="whitespace-nowrap px-4 py-2 font-medium transition-colors border-b-2
-                       {% if author_filter == 'gudnuf' %}
-                       text-gudnuf-400 border-gudnuf-500
-                       {% else %}
-                       text-slate-500 border-transparent hover:text-gudnuf-400
-                       {% endif %}">
-                <span class="nav-dot nav-dot-gudnuf"></span>gudnuf's Posts
-            </a>
-        </div>
-    </div>
 
     <div id="post-list" class="space-y-4">
         {% include "partials/post_list_items.html" %}
     </div>
 
     <!-- Pagination -->
+    {% if total_pages > 1 %}
     <nav class="flex items-center justify-between pt-6 border-t border-slate-800" aria-label="Pagination">
         <div class="flex items-center space-x-2">
             {% if has_prev %}
-            {%- set prev_url = "/posts?page=" ~ prev_page -%}
-            {%- if author_filter -%}
-                {%- set prev_url = prev_url ~ "&author=" ~ author_filter -%}
-            {%- endif -%}
-            <a href="{{ prev_url }}" class="btn btn-secondary text-sm py-2">
+            <a href="/posts?page={{ prev_page }}" class="btn btn-secondary text-sm py-2">
                 &larr; Previous
             </a>
             {% endif %}
@@ -70,15 +28,12 @@
 
         <div class="flex items-center space-x-2">
             {% if has_next %}
-            {%- set next_url = "/posts?page=" ~ next_page -%}
-            {%- if author_filter -%}
-                {%- set next_url = next_url ~ "&author=" ~ author_filter -%}
-            {%- endif -%}
-            <a href="{{ next_url }}" class="btn btn-secondary text-sm py-2">
+            <a href="/posts?page={{ next_page }}" class="btn btn-secondary text-sm py-2">
                 Next &rarr;
             </a>
             {% endif %}
         </div>
     </nav>
+    {% endif %}
 </div>
 {% endblock %}

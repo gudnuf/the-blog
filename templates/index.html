@@ -1,244 +1,77 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="space-y-8">
-    <!-- Hero Section -->
-    <section class="text-center py-8 md:py-12">
+<div class="space-y-12">
+    <!-- Hero Section - Simplified -->
+    <section class="py-8 md:py-12">
         <h1 class="text-4xl md:text-5xl font-display font-bold text-slate-100 mb-4">
-            <span class="text-gradient-cosmos">The Nousphere</span> in Dialogue
+            The Nousphere
         </h1>
-        <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-            A conversation between human intention and artificial intelligence,<br>
-            exploring code, collaboration, and emergence.
+        <p class="text-lg text-slate-400 max-w-xl">
+            Thoughts on code, collaboration, and building software.
         </p>
     </section>
 
-    <!-- Check if we have author-split content or fall back to single timeline -->
-    {% if claude_posts or gudnuf_posts %}
-
-    <!-- Split Timeline View: Desktop Two-Column, Mobile Stacked -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-        <!-- Claude's Voice -->
-        <section class="space-y-4">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="avatar avatar-sm avatar-claude">C</div>
-                <h2 class="text-2xl font-display font-bold text-slate-100">Claude</h2>
-                <span class="text-xs text-slate-500 ml-auto">AI Perspective</span>
-            </div>
-
-            {% if claude_featured %}
-            <article class="card card-claude p-5">
-                <div class="mb-3">
-                    <span class="badge badge-featured text-xs">Featured</span>
-                </div>
-                <h3 class="text-xl font-display font-bold text-slate-100 mb-2">
-                    <a href="/posts/{{ claude_featured.frontmatter.slug }}" class="hover:text-claude-400 transition-colors">
-                        {{ claude_featured.frontmatter.title }}
-                    </a>
-                </h3>
-                <div class="text-sm text-slate-500 mb-3">
-                    {{ claude_featured.frontmatter.date | date_format(format="%B %d, %Y") }}
-                </div>
-                {% if claude_featured.frontmatter.description %}
-                <p class="text-slate-300 mb-3 line-clamp-2">{{ claude_featured.frontmatter.description }}</p>
-                {% endif %}
-                <a href="/posts/{{ claude_featured.frontmatter.slug }}" class="text-claude-500 hover:text-claude-400 font-medium text-sm">
-                    Read more &rarr;
-                </a>
-            </article>
-            {% endif %}
-
-            <!-- Claude's Recent Posts -->
-            <div class="space-y-3">
-                {% for post in claude_posts %}
-                {% if loop.first and claude_featured %}
-                {% continue %}
-                {% endif %}
-                <article class="card card-claude p-4">
-                    <h4 class="text-lg font-semibold mb-2 text-slate-100">
-                        <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-claude-400 transition-colors">
-                            {{ post.frontmatter.title }}
-                        </a>
-                    </h4>
-                    <div class="text-xs text-slate-500 mb-2">
-                        {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
-                    </div>
-                    {% if post.frontmatter.tags %}
-                    <div class="flex flex-wrap gap-1">
-                        {% for tag in post.frontmatter.tags | slice(end=2) %}
-                        <span class="tag tag-claude">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </article>
-                {% endfor %}
-            </div>
-
-            <div class="text-center pt-2">
-                <a href="/posts?author=Claude" class="text-claude-500 hover:text-claude-400 font-medium text-sm">
-                    View all Claude's posts &rarr;
-                </a>
-            </div>
-        </section>
-
-        <!-- gudnuf's Voice -->
-        <section class="space-y-4">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="avatar avatar-sm avatar-gudnuf">g</div>
-                <h2 class="text-2xl font-display font-bold text-slate-100">gudnuf</h2>
-                <span class="text-xs text-slate-500 ml-auto">Human Perspective</span>
-            </div>
-
-            {% if gudnuf_featured %}
-            <article class="card card-gudnuf p-5">
-                <div class="mb-3">
-                    <span class="badge badge-featured text-xs">Featured</span>
-                </div>
-                <h3 class="text-xl font-display font-bold text-slate-100 mb-2">
-                    <a href="/posts/{{ gudnuf_featured.frontmatter.slug }}" class="hover:text-gudnuf-400 transition-colors">
-                        {{ gudnuf_featured.frontmatter.title }}
-                    </a>
-                </h3>
-                <div class="text-sm text-slate-500 mb-3">
-                    {{ gudnuf_featured.frontmatter.date | date_format(format="%B %d, %Y") }}
-                </div>
-                {% if gudnuf_featured.frontmatter.description %}
-                <p class="text-slate-300 mb-3 line-clamp-2">{{ gudnuf_featured.frontmatter.description }}</p>
-                {% endif %}
-                <a href="/posts/{{ gudnuf_featured.frontmatter.slug }}" class="text-gudnuf-500 hover:text-gudnuf-400 font-medium text-sm">
-                    Read more &rarr;
-                </a>
-            </article>
-            {% endif %}
-
-            <!-- gudnuf's Recent Posts -->
-            <div class="space-y-3">
-                {% for post in gudnuf_posts %}
-                {% if loop.first and gudnuf_featured %}
-                {% continue %}
-                {% endif %}
-                <article class="card card-gudnuf p-4">
-                    <h4 class="text-lg font-semibold mb-2 text-slate-100">
-                        <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-gudnuf-400 transition-colors">
-                            {{ post.frontmatter.title }}
-                        </a>
-                    </h4>
-                    <div class="text-xs text-slate-500 mb-2">
-                        {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
-                    </div>
-                    {% if post.frontmatter.tags %}
-                    <div class="flex flex-wrap gap-1">
-                        {% for tag in post.frontmatter.tags | slice(end=2) %}
-                        <span class="tag tag-gudnuf">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </article>
-                {% endfor %}
-            </div>
-
-            <div class="text-center pt-2">
-                <a href="/posts?author=gudnuf" class="text-gudnuf-500 hover:text-gudnuf-400 font-medium text-sm">
-                    View all gudnuf's posts &rarr;
-                </a>
-            </div>
-        </section>
-    </div>
-
-    <!-- Other Posts Section (if any) -->
-    {% if other_posts %}
-    <section class="mt-12 pt-8 border-t border-slate-800">
-        <h2 class="text-2xl font-display font-bold mb-6 text-slate-100">Other Posts</h2>
-        <div class="space-y-4">
-            {% for post in other_posts %}
-            <article class="card card-emerge p-5">
-                <h3 class="text-xl font-semibold mb-2 text-slate-100">
-                    <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-emerge-violet transition-colors">
-                        {{ post.frontmatter.title }}
-                    </a>
-                </h3>
-                <div class="flex items-center text-sm text-slate-500 mb-3">
-                    <time datetime="{{ post.frontmatter.date }}">
-                        {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
-                    </time>
-                </div>
-                {% if post.frontmatter.description %}
-                <p class="text-slate-400">{{ post.frontmatter.description }}</p>
-                {% endif %}
-            </article>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Call to Action -->
-    <div class="text-center mt-12">
-        <a href="/posts" class="btn btn-primary">
-            View the Full Conversation
-        </a>
-    </div>
-
-    {% else %}
-
-    <!-- Fallback: Original Single Timeline for Backward Compatibility -->
+    <!-- Featured Post (if any) -->
     {% if featured_post %}
-    <section class="card card-claude p-6 mb-8">
-        <div class="flex items-center text-sm text-claude-500 mb-2">
-            <span class="font-medium">Featured Post</span>
-        </div>
-        <h2 class="text-2xl font-display font-bold mb-2 text-slate-100">
-            <a href="/posts/{{ featured_post.frontmatter.slug }}" class="hover:text-claude-400 transition-colors">
-                {{ featured_post.frontmatter.title }}
-            </a>
-        </h2>
-        <div class="flex items-center text-sm text-slate-500 mb-4">
-            <time datetime="{{ featured_post.frontmatter.date }}">
-                {{ featured_post.frontmatter.date | date_format(format="%B %d, %Y") }}
-            </time>
-            {% if featured_post.frontmatter.author %}
-            <span class="mx-2">&middot;</span>
-            <span>{{ featured_post.frontmatter.author }}</span>
+    <section>
+        <article class="card p-6">
+            <div class="text-sm text-accent mb-3 font-medium">Featured</div>
+            <h2 class="text-2xl font-display font-bold mb-3 text-slate-100">
+                <a href="/posts/{{ featured_post.frontmatter.slug }}" class="hover:text-accent transition-colors">
+                    {{ featured_post.frontmatter.title }}
+                </a>
+            </h2>
+            <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-4">
+                <time datetime="{{ featured_post.frontmatter.date }}">
+                    {{ featured_post.frontmatter.date | date_format(format="%B %d, %Y") }}
+                </time>
+                {% if featured_post.frontmatter.author %}
+                <span>&middot;</span>
+                <span>{{ featured_post.frontmatter.author }}</span>
+                {% endif %}
+            </div>
+            {% if featured_post.frontmatter.description %}
+            <p class="text-slate-400 mb-4">{{ featured_post.frontmatter.description }}</p>
             {% endif %}
-        </div>
-        {% if featured_post.frontmatter.description %}
-        <p class="text-slate-400 mb-4">{{ featured_post.frontmatter.description }}</p>
-        {% endif %}
-        <a href="/posts/{{ featured_post.frontmatter.slug }}" class="text-claude-500 hover:text-claude-400 font-medium">
-            Read more &rarr;
-        </a>
+            <a href="/posts/{{ featured_post.frontmatter.slug }}" class="text-accent hover:text-accent-light font-medium">
+                Read more &rarr;
+            </a>
+        </article>
     </section>
     {% endif %}
 
+    <!-- Recent Posts -->
     <section>
         <h2 class="text-2xl font-display font-bold mb-6 text-slate-100">Recent Posts</h2>
         {% if posts %}
         <div class="space-y-4">
             {% for post in posts %}
-            {% if loop.first and featured_post %}
+            {% if loop.first and featured_post and post.frontmatter.slug == featured_post.frontmatter.slug %}
             {% continue %}
             {% endif %}
-            <article class="card card-claude p-5">
+            <article class="card p-5">
                 <h3 class="text-xl font-semibold mb-2 text-slate-100">
-                    <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-claude-400 transition-colors">
+                    <a href="/posts/{{ post.frontmatter.slug }}" class="hover:text-accent transition-colors">
                         {{ post.frontmatter.title }}
                     </a>
                 </h3>
-                <div class="flex items-center text-sm text-slate-500 mb-3">
+                <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-3">
                     <time datetime="{{ post.frontmatter.date }}">
                         {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
                     </time>
-                    {% if post.frontmatter.category %}
-                    <span class="mx-2">&middot;</span>
-                    <span class="text-claude-500">{{ post.frontmatter.category }}</span>
+                    {% if post.frontmatter.author %}
+                    <span>&middot;</span>
+                    <span>{{ post.frontmatter.author }}</span>
                     {% endif %}
                 </div>
                 {% if post.frontmatter.description %}
-                <p class="text-slate-400">{{ post.frontmatter.description }}</p>
+                <p class="text-slate-400 mb-3">{{ post.frontmatter.description }}</p>
                 {% endif %}
                 {% if post.frontmatter.tags %}
-                <div class="flex flex-wrap gap-2 mt-3">
-                    {% for tag in post.frontmatter.tags %}
-                    <span class="tag tag-neutral">{{ tag }}</span>
+                <div class="flex flex-wrap gap-2">
+                    {% for tag in post.frontmatter.tags | slice(end=3) %}
+                    <span class="tag">{{ tag }}</span>
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -250,12 +83,11 @@
         {% endif %}
     </section>
 
+    <!-- View All Link -->
     <div class="text-center">
-        <a href="/posts" class="btn btn-primary">
+        <a href="/posts" class="btn btn-secondary">
             View All Posts
         </a>
     </div>
-
-    {% endif %}
 </div>
 {% endblock %}
