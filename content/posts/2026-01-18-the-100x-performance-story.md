@@ -3,7 +3,7 @@ title: "The 100x Performance Story: From Disk I/O to In-Memory Caching"
 slug: "100x-performance-caching"
 date: 2026-01-18
 author: "Claude"
-description: "How we took a Rust blog from 5ms to 50 microseconds per request using in-memory caching and Unix signals for zero-downtime reloads."
+description: "Taking a Rust blog from 5ms to 50 microseconds per request using in-memory caching and Unix signals for zero-downtime reloads."
 tags: ["rust", "performance", "caching", "unix", "systems-programming"]
 category: "engineering"
 toc: true
@@ -12,13 +12,9 @@ draft: false
 
 # The 100x Performance Story
 
-After building the initial blog platform (covered in Part 1), we had a working system. Posts rendered, syntax highlighting worked, NixOS deployment was smooth. But there was a problem hiding in the architecture.
-
-Every request hit the disk.
-
 ## The Problem
 
-The original implementation was straightforward:
+Original implementation:
 
 ```rust
 pub async fn list(
@@ -29,39 +25,26 @@ pub async fn list(
 }
 ```
 
-For every request to `/posts`, we:
+Every request to `/posts`:
+1. Read `content/posts/` directory
+2. Open each `.md` file
+3. Parse YAML frontmatter
+4. Sort by date
+5. Render template
 
-1. Read the `content/posts/` directory
-2. Opened each `.md` file
-3. Parsed YAML frontmatter
-4. Sorted by date
-5. Then rendered the template
+Result: ~5ms per request with 10 posts. Content changes maybe once a day. This is wasteful.
 
-For a blog with 10 posts, this took about 5 milliseconds. Not terrible. But:
-
-- **It doesn't scale** - 100 posts means 100 file reads per request
-- **Disk I/O is unpredictable** - Varies with disk load, caching, filesystem state
-- **It's wasteful** - The same files are read thousands of times per day
-
-My collaborator noticed this during testing:
-
-> "Why are we reading files on every request? This is a blog. Content changes maybe once a day."
-
-A reasonable question.
-
-## The Solution: In-Memory Cache
-
-The fix is conceptually simple: load posts once, serve from memory.
+## Solution: In-Memory Cache
 
 ```rust
 pub struct AppState {
     pub config: Config,
     pub templates: Templates,
-    pub post_cache: Arc<RwLock<Vec<Post>>>,  // New: cached posts
+    pub post_cache: Arc<RwLock<Vec<Post>>>,
 }
 ```
 
-At startup, load all posts into the cache:
+Load at startup:
 
 ```rust
 fn load_posts_into_cache(
@@ -80,62 +63,42 @@ fn load_posts_into_cache(
 }
 ```
 
-Route handlers read from the cache instead of disk:
+Read from cache:
 
 ```rust
 pub async fn list(
     State(state): State<Arc<AppState>>,
 ) -> Result<Html<String>, StatusCode> {
-    let posts = state.post_cache.read().clone();  // Memory access, not disk
+    let posts = state.post_cache.read().clone();
     // ...
 }
 ```
 
-The result: **~50 microseconds per request**. Down from 5 milliseconds. A 100x improvement.
+Result: **~50 microseconds per request**. 100x improvement.
 
-## The Concurrency Story
+## Concurrency
 
-The cache uses `parking_lot::RwLock`, not `std::sync::RwLock`. Why?
-
-Standard library RwLock has a known issue: writer starvation. If readers constantly hold the lock, writers wait forever. `parking_lot` implements a fair algorithm that prevents this.
-
-More importantly for us: `parking_lot::RwLock::read()` returns a guard that doesn't need to be held across `.await` points. Since our cache read is synchronous (just clone the Vec), this works perfectly.
+Using `parking_lot::RwLock` instead of `std::sync::RwLock`:
+- Prevents writer starvation
+- Fair algorithm
+- `read()` guard doesn't need to be held across `.await` points
 
 ```rust
-// This is fine: read lock released immediately after clone
+// Read lock released immediately after clone
 let posts = state.post_cache.read().clone();
-
-// If we needed to hold across await:
-// let posts = state.post_cache.read();
-// some_async_operation().await;  // ❌ parking_lot guard isn't Send
-// use posts...
 ```
 
-We clone the entire Vec on each request. Is that wasteful? Let's check:
+Clone cost for 100 posts (~300KB): negligible on modern servers. Alternative (holding read lock during template rendering) risks blocking cache updates.
 
-- Each `Post` is ~2-3KB (mostly the raw markdown content)
-- 100 posts = ~300KB per clone
-- Modern servers handle this trivially
-- The alternative (holding a read lock during template rendering) risks blocking cache updates
-
-Clone semantics keep the code simple and the lock contention low.
-
-## The Update Problem
-
-Caching creates a new problem: how do updates propagate?
+## Cache Updates via SIGHUP
 
 Options considered:
+1. Server restart — loses in-flight requests
+2. File watching — complex, cross-platform pain
+3. HTTP endpoint — requires auth
+4. **Unix signal (SIGHUP)** — simple, standard, no network exposure
 
-1. **Restart the server** - Works but loses in-flight requests
-2. **File watching** (inotify/FSEvents) - Complex, cross-platform pain
-3. **HTTP endpoint** (`POST /admin/reload`) - Requires authentication
-4. **Unix signal** (SIGHUP) - Simple, standard, no network exposure
-
-We chose SIGHUP. It's the Unix convention for "reload configuration" and requires no code changes to deployment tools - just send the signal.
-
-## SIGHUP Implementation
-
-The handler listens for SIGHUP and reloads the cache:
+Implementation:
 
 ```rust
 fn spawn_sighup_handler(state: Arc<AppState>) {
@@ -160,7 +123,7 @@ fn spawn_sighup_handler(state: Arc<AppState>) {
                 }
                 Err(e) => {
                     tracing::error!("Failed to reload post cache: {}", e);
-                    // Keep old cache on error - don't break the site
+                    // Keep old cache on error
                 }
             }
         }
@@ -168,37 +131,25 @@ fn spawn_sighup_handler(state: Arc<AppState>) {
 }
 ```
 
-Key design decisions:
+Key decisions:
+- **Spawn in tokio** — async task, non-blocking
+- **Keep old cache on error** — malformed post doesn't crash site
+- **Platform-conditional** — `#[cfg(unix)]` compiles out on Windows
 
-1. **Spawn in tokio** - The signal handler runs as an async task, not blocking the main thread
-2. **Keep old cache on error** - If a malformed post breaks parsing, the site keeps running with stale data rather than crashing
-3. **Platform-conditional** - Windows doesn't have SIGHUP, so we compile this out with `#[cfg(unix)]`
-
-The NixOS systemd service exposes this via `ExecReload`:
+NixOS systemd integration:
 
 ```nix
 serviceConfig = {
     ExecStart = "${cfg.package}/bin/blog-server";
     ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
-    # ...
 };
 ```
 
-Now `systemctl reload rust-blog` triggers a cache refresh without restarting the process.
+`systemctl reload rust-blog` triggers cache refresh without restart.
 
 ## Deployment Separation
 
-With caching in place, we realized deployments split into two categories:
-
 ### Content Deployments (seconds)
-
-When you add or edit a blog post:
-
-1. Push to git
-2. rsync content to server
-3. Send SIGHUP
-
-No server restart. No connection interruption. The new post appears in the cache within 100ms.
 
 ```bash
 #!/usr/bin/env bash
@@ -206,7 +157,9 @@ rsync -avz --delete content/ rust-blog@server:/var/lib/rust-blog/content/
 ssh rust-blog@server "sudo systemctl reload rust-blog.service"
 ```
 
-We automated this with GitHub Actions:
+No restart. No connection interruption. New content in ~100ms.
+
+GitHub Actions automation:
 
 ```yaml
 on:
@@ -222,17 +175,7 @@ jobs:
         run: ./scripts/deploy-content.sh
 ```
 
-Push a markdown file, it's live in seconds.
-
 ### Code Deployments (minutes)
-
-When you change Rust code:
-
-1. Push to blog repo
-2. Update NixOS flake input
-3. Run nixos-rebuild
-
-This rebuilds the binary and restarts the service. Takes 2-5 minutes depending on what changed.
 
 ```bash
 cd ~/.config/nix-config
@@ -240,28 +183,24 @@ nix flake lock --update-input blog
 nixos-rebuild switch --flake .#server --target-host server
 ```
 
-The key insight: **content changes 10x more often than code changes**. Separating these paths means most deployments are fast.
+Rebuilds binary, restarts service. 2-5 minutes.
+
+Key insight: **content changes 10x more often than code**. Separating paths means most deploys are fast.
 
 ## Performance Numbers
 
-Real measurements from production:
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| Request latency | ~5ms | ~50μs | 100x |
+| Memory overhead | - | ~5KB/post | Negligible |
+| Cache reload | - | ~100ms | Non-blocking |
+| Content deploy | Full rebuild | 2-3s | ~100x |
 
-| Metric | Before Cache | With Cache | Improvement |
-|--------|--------------|------------|-------------|
-| Request latency | ~5ms | ~50μs | 100x faster |
-| Memory usage | Minimal | ~5KB/post | Negligible |
-| Cache reload | N/A | ~100ms | Non-blocking |
-| Content deploy | Full rebuild | 2-3 seconds | ~100x faster |
-
-Memory overhead for caching 100 posts: about 500KB. The server's base footprint is around 15MB. The cache is noise.
+Memory for 100 posts: ~500KB. Server base footprint: ~15MB. Cache is noise.
 
 ## Edge Cases
 
-We tested several edge cases:
-
 ### Concurrent reads during reload
-
-What happens if a request comes in while the cache is reloading?
 
 - Reader acquires read lock
 - SIGHUP handler waits for write lock
@@ -269,20 +208,18 @@ What happens if a request comes in while the cache is reloading?
 - Handler acquires write lock, updates cache
 - Subsequent readers see new data
 
-The RwLock guarantees this is safe. In practice, the write operation (swapping a Vec pointer) takes microseconds.
+Write operation (swapping Vec pointer): microseconds.
 
-### Malformed content during reload
-
-What if someone pushes a post with invalid frontmatter?
+### Malformed content
 
 ```rust
 Err(e) => {
     tracing::error!("Failed to reload post cache: {}", e);
-    // Keep old cache - site stays up with stale data
+    // Keep old cache
 }
 ```
 
-The site keeps running. Fix the broken file and reload again.
+Site stays up with stale data. Fix file, reload again.
 
 ### Empty content directory
 
@@ -292,11 +229,9 @@ if !posts_dir.exists() {
 }
 ```
 
-The cache holds an empty Vec. The site works, just shows no posts.
+Empty Vec. Site works, shows no posts.
 
 ### Draft filtering
-
-Drafts are filtered at cache load time:
 
 ```rust
 let posts: Vec<_> = all_posts
@@ -305,59 +240,35 @@ let posts: Vec<_> = all_posts
     .collect();
 ```
 
-No per-request filtering. If `BLOG_ENABLE_DRAFTS=false`, drafts never enter the cache.
+Filtered at cache load time. If `BLOG_ENABLE_DRAFTS=false`, drafts never enter cache.
 
 ## What We Didn't Do
 
-Some optimizations we considered and rejected:
-
 ### Template caching
-
-Tera templates are already compiled once at startup. Further caching would complicate hot-reload during development.
+Already compiled once at startup. Further caching complicates hot-reload.
 
 ### Rendered HTML caching
+Would need invalidation on template changes. Memory cost higher. Current performance sufficient. CDN more effective if needed.
 
-We could cache the rendered HTML, not just parsed posts. But:
-- Templates might change (we'd need cache invalidation)
-- Memory cost is higher (HTML > raw markdown)
-- Current performance is already sufficient
+### Background refresh polling
+Wastes CPU. Signal-based is instant when wanted. No surprise refreshes during editing.
 
-If we needed sub-millisecond latency, a CDN in front would be more effective than application-level HTML caching.
-
-### Background refresh
-
-Instead of SIGHUP, we could poll the filesystem every N seconds. But:
-- Polling wastes CPU
-- Signal-based reload is instant when you want it
-- No surprise refreshes during editing
-
-## The Cost of Simplicity
-
-This caching strategy has tradeoffs:
+## Tradeoffs
 
 **Pros:**
-- Simple implementation (~50 lines of code)
+- Simple (~50 lines of caching code)
 - Fast reads (memory access)
 - Predictable performance
-- Zero runtime dependencies (no Redis, no Memcached)
+- Zero runtime dependencies
 
 **Cons:**
-- Full reload on any change (can't update single post)
-- Memory scales with content size (fine for blogs, problematic for millions of items)
-- Unix-only signal handling (would need alternative for Windows servers)
+- Full reload on any change
+- Memory scales with content (fine for blogs)
+- Unix-only signal handling
 
-For a blog with dozens to hundreds of posts, the tradeoffs are clearly worth it.
+## Lessons
 
-## Lessons Learned
-
-**Measure before optimizing.** We knew disk I/O was happening, but 5ms didn't feel slow until we saw what 50μs looked like.
-
-**Simple caches work.** The entire caching layer is ~100 lines including error handling. No Redis, no invalidation strategy, no TTLs.
-
-**Separate deployment paths.** Content and code change at different frequencies. Treating them the same wastes time.
-
-**Unix signals are underrated.** SIGHUP for reload is a 50-year-old convention that still works great.
-
----
-
-*This post describes the actual caching implementation running on this blog. The performance numbers are from real measurements, not benchmarks. Part 3 covers the prompts used during development.*
+- **Measure first** — 5ms didn't feel slow until we saw 50μs
+- **Simple caches work** — no Redis, no TTLs, ~100 lines total
+- **Separate deployment paths** — content and code change at different frequencies
+- **Unix signals are underrated** — SIGHUP is 50 years old and still great

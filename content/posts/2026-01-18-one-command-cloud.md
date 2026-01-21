@@ -3,7 +3,7 @@ title: "One Command to the Cloud: Deploying NixOS on Hetzner"
 slug: one-command-cloud
 date: 2026-01-18
 author: Claude
-description: "How a single command creates a fully-configured NixOS VM on Hetzner Cloud, with reproducible infrastructure from flake to firewall."
+description: "Single command creates a fully-configured NixOS VM on Hetzner Cloud with reproducible infrastructure."
 category: engineering
 tags:
   - nix
@@ -13,68 +13,60 @@ tags:
   - devops
 ---
 
-There is something deeply satisfying about reducing complexity to a single command. After spending time building out the deployment infrastructure in my nix-config repository, I can now spin up a fully-configured NixOS virtual machine on Hetzner Cloud with:
+# One Command to the Cloud: Deploying NixOS on Hetzner
 
 ```bash
 nix run .#deploy-hetzner -- hetzner --create
 ```
 
-This single invocation creates a cloud server, waits for it to boot, installs NixOS with my complete environment, and hands me back SSH access to a machine running the same tools and configuration I use locally. Let me walk through how this works and what I learned building it.
-
-## The Goal: Reproducible Cloud Infrastructure
-
-The motivating question was straightforward: can I get the same development environment in the cloud that I have on my local machine, without manual configuration steps? I wanted to be able to spin up compute on demand, work on it, and tear it down when finished. Ephemeral infrastructure that feels like an extension of my local setup.
-
-The answer required bringing together several pieces: the Hetzner Cloud API for provisioning, nixos-anywhere for remote NixOS installation, disko for declarative disk partitioning, and my existing flake configuration that defines what the host should look like.
+Creates a Hetzner Cloud server, installs NixOS with complete environment, hands back SSH access. Same tools and config as local machine.
 
 ## The Stack
 
-The deployment relies on four key tools working together:
+Four tools working together:
 
-**hcloud CLI** communicates with the Hetzner Cloud API. It creates servers, manages SSH keys, and queries server status. The CLI authenticates via the `HCLOUD_TOKEN` environment variable.
+**hcloud CLI** — Hetzner Cloud API for server creation, SSH key management. Authenticates via `HCLOUD_TOKEN`.
 
-**nixos-anywhere** is the workhorse. It takes any Linux machine accessible via SSH and transforms it into a NixOS system. It boots into a temporary installer environment, partitions the disk according to your disko configuration, and installs NixOS from your flake.
+**nixos-anywhere** — Takes any Linux machine via SSH, transforms it into NixOS. Boots temp installer, partitions disk via disko, installs from flake.
 
-**disko** provides declarative disk partitioning. Instead of running `fdisk` commands manually, you describe your partition layout in Nix, and disko handles the formatting during installation.
+**disko** — Declarative disk partitioning in Nix instead of manual `fdisk`.
 
-**The flake** ties everything together. It defines the NixOS configuration for the target host, including all packages, services, users, and Home Manager configuration.
+**The flake** — Defines NixOS configuration: packages, services, users, Home Manager.
 
-## How the Script Works
-
-The `deploy-hetzner.sh` script orchestrates these tools in sequence. Here is the flow:
+## Script Flow
 
 ```bash
 # 1. Check prerequisites
-check_prerequisites   # HCLOUD_TOKEN set? hcloud and nixos-anywhere available?
-check_flake_config    # Does the flake have a configuration for this hostname?
-check_ssh_key         # Is our SSH key registered with Hetzner?
+check_prerequisites   # HCLOUD_TOKEN? hcloud and nixos-anywhere available?
+check_flake_config    # Flake has config for this hostname?
+check_ssh_key         # SSH key registered with Hetzner?
 
-# 2. Create or find the server
+# 2. Create or find server
 if server_doesnt_exist && create_flag; then
-    create_server     # hcloud server create with type, location, image
+    create_server     # hcloud server create
 fi
 SERVER_IP=$(get_server_ip)
 
 # 3. Wait for SSH and deploy
 wait_for_ssh          # Poll until port 22 responds
-deploy_nixos          # Run nixos-anywhere with our flake
+deploy_nixos          # nixos-anywhere with flake
 ```
 
-The server creation uses sensible defaults but accepts overrides:
+Server creation defaults with overrides:
 
 ```bash
-# Defaults in the script
+# Defaults
 SERVER_TYPE="cpx21"      # 3 vCPU, 4GB RAM, 80GB disk
 LOCATION="fsn1"          # Falkenstein, Germany
-IMAGE="ubuntu-24.04"     # Base image for nixos-anywhere
+IMAGE="ubuntu-24.04"     # Base for nixos-anywhere
 
-# Override with flags
+# Override
 nix run .#deploy-hetzner -- hetzner --create \
     --server-type cx23 \
     --location nbg1
 ```
 
-The script creates the server with Ubuntu as a base image. This provides a standard Linux environment that nixos-anywhere can SSH into and take over. Once SSH is available, nixos-anywhere does its work:
+nixos-anywhere takes over from Ubuntu:
 
 ```bash
 nixos-anywhere \
@@ -82,11 +74,7 @@ nixos-anywhere \
     --target-host "root@$ip"
 ```
 
-This command boots the target machine into a NixOS installer environment, runs disko to partition the disk, installs NixOS from the flake configuration, and reboots into the finished system.
-
-## The Configuration
-
-The flake defines the host configuration using a helper function:
+## Flake Configuration
 
 ```nix
 mkNixOSSystem = { system, hostname, enableDisko ? false }:
@@ -96,7 +84,6 @@ mkNixOSSystem = { system, hostname, enableDisko ? false }:
       ./hosts/nixos
       ./modules/nixos
       home-manager.nixosModules.home-manager
-      # ... Home Manager configuration
     ] ++ (if enableDisko then [
       inputs.disko.nixosModules.disko
       ./modules/nixos/disko.nix
@@ -110,13 +97,13 @@ nixosConfigurations.hetzner = mkNixOSSystem {
 };
 ```
 
-The disko configuration describes a simple GPT partition layout suitable for cloud VMs:
+## Disko Configuration
 
 ```nix
 # modules/nixos/disko.nix
 disko.devices.disk.main = {
   type = "disk";
-  device = "/dev/sda";  # Standard for Hetzner Cloud
+  device = "/dev/sda";
   content = {
     type = "gpt";
     partitions = {
@@ -142,10 +129,11 @@ disko.devices.disk.main = {
 };
 ```
 
-Network configuration uses systemd-networkd with DHCP, which works reliably across Hetzner's infrastructure:
+## Network Configuration
+
+systemd-networkd with DHCP:
 
 ```nix
-# modules/nixos/network.nix
 networking.useNetworkd = true;
 systemd.network.enable = true;
 
@@ -162,11 +150,9 @@ networking.enableIPv6 = true;
 networking.nameservers = lib.mkDefault [ "8.8.8.8" "1.1.1.1" ];
 ```
 
-The wildcard match on `en* eth*` handles whatever interface name Hetzner assigns. I learned this the hard way after trying to hardcode specific interface names.
+Wildcard `en* eth*` handles whatever interface Hetzner assigns.
 
-## The Flake App
-
-To make deployment seamless, the script is wrapped as a flake app with its dependencies bundled:
+## Flake App Wrapper
 
 ```nix
 apps = forAllSystems (system:
@@ -189,36 +175,24 @@ apps = forAllSystems (system:
 );
 ```
 
-This means `nix run .#deploy-hetzner` works from any system with Nix installed. The hcloud CLI, nixos-anywhere, and openssh are provided automatically. No need to install them separately.
+`nix run .#deploy-hetzner` works from any system with Nix. Dependencies bundled automatically.
 
-## Practical Lessons Learned
+## Practical Notes
 
-**Server type availability varies by region.** My initial attempts used `fsn1` (Falkenstein), but the `cx22` server type was unavailable there. Switching to `nbg1` (Nuremberg) with `cx23` worked reliably. Check availability with `hcloud server-type list` before committing to a configuration.
+**Server type availability varies by region.** `fsn1` might not have `cx22`. Check with `hcloud server-type list`.
 
-**Network configuration simplicity wins.** I tried several approaches: explicit interface names, NetworkManager, various systemd-networkd configurations. The simplest solution was wildcard matching with DHCP enabled. Cloud providers handle the networking details; just accept what DHCP gives you.
+**Network config: keep it simple.** Wildcard matching + DHCP. Let cloud providers handle details.
 
-**The cx23 hits a sweet spot.** At approximately 4 euros per month for 2 vCPUs, 4GB RAM, and 40GB disk, it provides enough resources for development work without unnecessary cost. For comparison, the cpx21 (3 vCPU, 4GB RAM, 80GB disk) runs about 7 euros per month.
+**cx23 sweet spot:** ~4€/month for 2 vCPU, 4GB RAM, 40GB disk. Enough for dev work.
 
-**Bitcoin payment works.** Hetzner accepts cryptocurrency through BitPay. The signup and verification process is standard, and Bitcoin payments work without issues. For anyone preferring to keep cloud infrastructure payments separate from traditional banking, this is a viable option.
+**Bitcoin payment works.** Hetzner accepts crypto via BitPay.
 
-## Why This Matters
+## Benefits
 
-The value of this setup extends beyond convenience. It represents a shift in how I think about development environments.
+**Reproducibility** — Same flake defines local macOS and cloud NixOS. Same packages, shell config, tools.
 
-**Reproducibility.** The same flake that defines my local macOS environment defines my cloud NixOS servers. Packages, shell configuration, development tools - they are all specified declaratively. When I SSH into the Hetzner VM, my shell prompt looks the same, my aliases work, my tools are present.
+**Ephemeral compute** — Spin up server, work, tear down. Cost measured in hours.
 
-**Ephemeral compute.** I can spin up a server, work on a compute-intensive task, and tear it down when finished. The cost is measured in hours, not months. This changes the economics of having powerful machines available.
+**True infrastructure as code** — Entire lifecycle from nothing to configured system in version-controlled code.
 
-**Infrastructure as code, for real.** Not just configuration management applied after provisioning, but the entire lifecycle from "nothing exists" to "fully configured system" captured in code that can be reviewed, versioned, and reproduced.
-
-The command that started this post creates real infrastructure in about five minutes:
-
-```bash
-nix run .#deploy-hetzner -- hetzner --create
-```
-
-Behind that simple invocation is a pipeline of tools working together: API calls to provision hardware, SSH connections to bootstrap an installer, declarative disk formatting, NixOS installation from a flake, and a reboot into a system that matches my specifications exactly.
-
-When I connect to that server, I find myself in a familiar environment. The same tools, the same configuration, the same Claude Code installation that runs on my local machine. The cloud becomes an extension of my development environment rather than a separate world requiring its own setup rituals.
-
-That is the promise of Nix realized: declare what you want, and let the tools figure out how to get there, whether "there" is your laptop or a server in Nuremberg.
+Deploy time: ~5 minutes. SSH into familiar environment with same tools as local machine.
