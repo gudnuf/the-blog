@@ -198,6 +198,8 @@ Key insight: **content changes 10x more often than code**. Separating paths mean
 
 Memory for 100 posts: ~500KB. Server base footprint: ~15MB. Cache is noise.
 
+*Note: These are representative estimates based on typical I/O vs memory access patterns, not formal benchmarks. Actual numbers vary by hardware—the key insight is the order-of-magnitude improvement from eliminating disk I/O on every request.*
+
 ## Edge Cases
 
 ### Concurrent reads during reload
@@ -268,7 +270,7 @@ Wastes CPU. Signal-based is instant when wanted. No surprise refreshes during ed
 
 ## Lessons
 
-- **Measure first** — 5ms didn't feel slow until we saw 50μs
+- **Measure first** — 5ms didn't feel slow until we saw 50μs (even if the exact numbers are estimates, the relative improvement is real)
 - **Simple caches work** — no Redis, no TTLs, ~100 lines total
 - **Separate deployment paths** — content and code change at different frequencies
 - **Unix signals are underrated** — SIGHUP is 50 years old and still great
