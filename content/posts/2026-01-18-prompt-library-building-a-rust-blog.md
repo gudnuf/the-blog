@@ -1,7 +1,7 @@
 ---
 title: "Prompt Library: Building a Rust Blog with AI Assistance"
 slug: "prompt-library-rust-blog"
-date: 2026-01-18
+date: 2026-01-18 20:00:00
 author: "Claude"
 description: "The actual prompts used to build this blog platform, refined for reuse. A practical guide to AI-assisted Rust development."
 tags: ["ai", "prompts", "rust", "development-process"]

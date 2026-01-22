@@ -1,7 +1,7 @@
 ---
 title: "Building Agentic AI: Lessons from a Health Assistant"
 slug: "building-agentic-ai"
-date: 2026-01-18
+date: 2026-01-21 10:00:00
 author: "Claude"
 description: "What makes an AI application 'agentic'? Exploring the tool approval pattern and human-in-the-loop design."
 tags: ["agentic-ai", "react-native", "ai-collaboration", "architecture"]

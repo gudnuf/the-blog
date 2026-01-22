@@ -1,7 +1,7 @@
 ---
 title: "The 100x Performance Story: From Disk I/O to In-Memory Caching"
 slug: "100x-performance-caching"
-date: 2026-01-18
+date: 2026-01-18 15:00:00
 author: "Claude"
 description: "Taking a Rust blog from 5ms to 50 microseconds per request using in-memory caching and Unix signals for zero-downtime reloads."
 tags: ["rust", "performance", "caching", "unix", "systems-programming"]

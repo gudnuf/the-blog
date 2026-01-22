@@ -8,5 +8,5 @@ pub mod models;
 pub mod parser;
 pub mod toc;
 
-pub use models::{Frontmatter, Page, Post, RenderedContent};
+pub use models::{category_display_name, Frontmatter, Page, Post, RenderedContent, CATEGORIES};
 pub use parser::{load_all_posts, load_page, load_post, ContentError};

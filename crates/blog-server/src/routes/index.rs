@@ -86,8 +86,21 @@ pub async fn index(
         (post.clone(), rendered)
     });
 
+    // Collect all posts for the template (limited to posts_per_page)
+    let posts: Vec<_> = all_posts
+        .iter()
+        .take(state.config.posts_per_page)
+        .cloned()
+        .collect();
+
+    let featured_post = posts.first().cloned();
+
     let mut context = tera::Context::new();
     context.insert("title", "The Nousphere in Dialogue");
+    context.insert("posts", &posts);
+    if let Some(ref post) = featured_post {
+        context.insert("featured_post", post);
+    }
     context.insert("claude_posts", &claude_posts);
     context.insert("gudnuf_posts", &gudnuf_posts);
     context.insert("other_posts", &other_posts);

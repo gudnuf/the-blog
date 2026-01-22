@@ -4,8 +4,22 @@
 <div class="space-y-8">
     <header>
         <h1 class="text-3xl font-display font-bold text-slate-100">{{ title }}</h1>
-        <p class="text-slate-400 mt-2">All posts</p>
+        <p class="text-slate-400 mt-2">{% if category_filter %}Filtered by category{% else %}All posts{% endif %}</p>
     </header>
+
+    <!-- Category Filter -->
+    <nav class="flex flex-wrap gap-2" aria-label="Filter by category">
+        <a href="/posts"
+           class="category-badge {% if not category_filter %}category-badge-active{% endif %}">
+            All
+        </a>
+        {% for cat in categories %}
+        <a href="/posts?category={{ cat.0 }}"
+           class="category-badge {% if category_filter == cat.0 %}category-badge-active{% endif %}">
+            {{ cat.1 }}
+        </a>
+        {% endfor %}
+    </nav>
 
     <div id="post-list" class="space-y-4">
         {% include "partials/post_list_items.html" %}

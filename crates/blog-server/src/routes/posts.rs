@@ -21,6 +21,7 @@ use crate::AppState;
 pub struct ListQuery {
     pub page: Option<usize>,
     pub author: Option<String>,
+    pub category: Option<String>,
 }
 
 /// Data structure for related posts that can be serialized to Tera
@@ -30,25 +31,26 @@ pub struct RelatedPostData {
     pub label: String,
 }
 
-/// List posts with pagination and optional author filtering
+/// List posts with pagination and optional author/category filtering
 pub async fn list(
     State(state): State<Arc<AppState>>,
     Query(query): Query<ListQuery>,
 ) -> Result<Html<String>, StatusCode> {
     let page = query.page.unwrap_or(1).max(1);
-    render_post_list(state, page, query.author).await
+    render_post_list(state, page, query.author, query.category).await
 }
 
 async fn render_post_list(
     state: Arc<AppState>,
     page: usize,
     author: Option<String>,
+    category: Option<String>,
 ) -> Result<Html<String>, StatusCode> {
     // Load from cache (already filtered by draft status)
     let all_posts = state.post_cache.read().clone();
 
     // Filter by author if provided
-    let filtered_posts: Vec<_> = if let Some(ref author_filter) = author {
+    let mut filtered_posts: Vec<_> = if let Some(ref author_filter) = author {
         all_posts
             .into_iter()
             .filter(|p| p.author().map(|a| a == author_filter).unwrap_or(false))
@@ -56,6 +58,20 @@ async fn render_post_list(
     } else {
         all_posts
     };
+
+    // Filter by category if provided
+    if let Some(ref cat_filter) = category {
+        filtered_posts = filtered_posts
+            .into_iter()
+            .filter(|p| {
+                p.frontmatter
+                    .category
+                    .as_ref()
+                    .map(|c| c == cat_filter)
+                    .unwrap_or(false)
+            })
+            .collect();
+    }
 
     let per_page = state.config.posts_per_page;
     let total_pages = (filtered_posts.len() + per_page - 1) / per_page;
@@ -69,9 +85,17 @@ async fn render_post_list(
 
     let title = if let Some(ref a) = author {
         format!("{}'s Posts", a)
+    } else if let Some(ref c) = category {
+        format!("{}", blog_content::category_display_name(c))
     } else {
         "All Posts".to_string()
     };
+
+    // Build categories list for filter badges
+    let categories: Vec<(&str, &str)> = blog_content::CATEGORIES
+        .iter()
+        .copied()
+        .collect();
 
     let mut context = tera::Context::new();
     context.insert("posts", &posts);
@@ -83,6 +107,8 @@ async fn render_post_list(
     context.insert("prev_page", &(page - 1));
     context.insert("title", &title);
     context.insert("author_filter", &author);
+    context.insert("category_filter", &category);
+    context.insert("categories", &categories);
 
     let html = state
         .templates

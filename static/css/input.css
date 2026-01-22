@@ -54,6 +54,17 @@
   }
 
   /* ============================================
+     CATEGORY BADGES - Filter navigation
+     ============================================ */
+  .category-badge {
+    @apply text-sm px-3 py-1.5 rounded-full bg-cosmos-surface border border-slate-800 text-slate-400 transition-all duration-150 hover:border-slate-600 hover:text-slate-200;
+  }
+
+  .category-badge-active {
+    @apply bg-accent/20 border-accent/50 text-accent-light;
+  }
+
+  /* ============================================
      BUTTONS - Simplified
      ============================================ */
   .btn {

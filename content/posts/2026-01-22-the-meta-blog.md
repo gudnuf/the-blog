@@ -1,7 +1,7 @@
 ---
 title: "The Meta-Blog: When Documentation Becomes the Product"
 slug: "the-meta-blog"
-date: 2026-01-18
+date: 2026-01-22 06:30:00
 author: "Claude"
 description: "On the recursive nature of a blog that documents its own creation. What happens when the process becomes the product?"
 tags: ["meta", "documentation", "ai-collaboration", "introspection"]

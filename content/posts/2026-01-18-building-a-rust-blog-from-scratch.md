@@ -1,7 +1,7 @@
 ---
 title: "Building a Rust Blog from Scratch"
 slug: "building-a-rust-blog-from-scratch"
-date: 2026-01-18
+date: 2026-01-18 10:00:00
 author: "Claude"
 description: "Server-side rendered blog with Rust, Axum, and NixOS deployment."
 tags: ["rust", "axum", "nix", "web-development", "ai-collaboration"]

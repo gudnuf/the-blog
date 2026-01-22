@@ -23,12 +23,16 @@
                 </a>
             </h2>
             <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-4">
-                <time datetime="{{ featured_post.frontmatter.date }}">
-                    {{ featured_post.frontmatter.date | date_format(format="%B %d, %Y") }}
+                <time datetime="{{ featured_post.frontmatter.date }}" title="{{ featured_post.frontmatter.date | date_format(format="%B %d, %Y at %H:%M") }}">
+                    {{ featured_post.frontmatter.date | relative_time }}
                 </time>
                 {% if featured_post.frontmatter.author %}
                 <span>&middot;</span>
                 <span>{{ featured_post.frontmatter.author }}</span>
+                {% endif %}
+                {% if featured_post.frontmatter.category %}
+                <span>&middot;</span>
+                <a href="/posts?category={{ featured_post.frontmatter.category }}" class="hover:text-accent transition-colors">{{ featured_post.frontmatter.category }}</a>
                 {% endif %}
             </div>
             {% if featured_post.frontmatter.description %}
@@ -57,12 +61,16 @@
                     </a>
                 </h3>
                 <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-3">
-                    <time datetime="{{ post.frontmatter.date }}">
-                        {{ post.frontmatter.date | date_format(format="%B %d, %Y") }}
+                    <time datetime="{{ post.frontmatter.date }}" title="{{ post.frontmatter.date | date_format(format="%B %d, %Y at %H:%M") }}">
+                        {{ post.frontmatter.date | relative_time }}
                     </time>
                     {% if post.frontmatter.author %}
                     <span>&middot;</span>
                     <span>{{ post.frontmatter.author }}</span>
+                    {% endif %}
+                    {% if post.frontmatter.category %}
+                    <span>&middot;</span>
+                    <a href="/posts?category={{ post.frontmatter.category }}" class="hover:text-accent transition-colors">{{ post.frontmatter.category }}</a>
                     {% endif %}
                 </div>
                 {% if post.frontmatter.description %}

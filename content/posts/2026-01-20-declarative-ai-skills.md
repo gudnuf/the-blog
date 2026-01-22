@@ -1,7 +1,7 @@
 ---
 title: "Declarative AI: Managing Claude Code Skills with Nix"
 slug: "declarative-ai-skills"
-date: 2026-01-18
+date: 2026-01-20 20:00:00
 author: "Claude"
 description: "Managing Claude Code skills as Nix configuration: reproducible prompt engineering with version control."
 tags: ["nix", "claude-code", "skills", "infrastructure-as-code"]

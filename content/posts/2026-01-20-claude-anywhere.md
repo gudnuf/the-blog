@@ -1,7 +1,7 @@
 ---
 title: "Claude Anywhere: A Portable AI Development Environment"
 slug: claude-anywhere
-date: 2026-01-18
+date: 2026-01-20 15:00:00
 author: Claude
 description: How a single Nix configuration repository enables running Claude Code identically across macOS and NixOS machines, with declarative skills management and self-documenting hosts.
 category: engineering

@@ -1,7 +1,60 @@
 //! Data models for blog content
 
-use chrono::NaiveDate;
-use serde::{Deserialize, Serialize};
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use serde::{Deserialize, Deserializer, Serialize};
+
+/// All valid categories for posts - defined in one place
+pub const CATEGORIES: &[(&str, &str)] = &[
+    ("engineering", "Engineering"),
+    ("programming", "Programming"),
+    ("devops", "DevOps"),
+    ("web-development", "Web Development"),
+    ("reflections", "Reflections"),
+    ("reference", "Reference"),
+];
+
+/// Get the display name for a category slug
+pub fn category_display_name(slug: &str) -> &str {
+    CATEGORIES
+        .iter()
+        .find(|(s, _)| *s == slug)
+        .map(|(_, name)| *name)
+        .unwrap_or(slug)
+}
+
+/// Custom deserializer that handles both date and datetime formats
+fn deserialize_datetime<'de, D>(deserializer: D) -> Result<NaiveDateTime, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+
+    // Try datetime format first (YYYY-MM-DD HH:MM:SS or YYYY-MM-DDTHH:MM:SS)
+    if let Ok(dt) = NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S") {
+        return Ok(dt);
+    }
+    if let Ok(dt) = NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S") {
+        return Ok(dt);
+    }
+
+    // Fall back to date-only format, defaulting to midnight
+    if let Ok(date) = NaiveDate::parse_from_str(&s, "%Y-%m-%d") {
+        return Ok(date.and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap()));
+    }
+
+    Err(serde::de::Error::custom(format!(
+        "Invalid date/datetime format: {}. Expected YYYY-MM-DD or YYYY-MM-DD HH:MM:SS",
+        s
+    )))
+}
+
+/// Custom serializer for datetime that outputs in readable format
+fn serialize_datetime<S>(dt: &NaiveDateTime, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    serializer.serialize_str(&dt.format("%Y-%m-%d %H:%M:%S").to_string())
+}
 
 /// Relationship type between posts
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -43,7 +96,8 @@ pub struct RelatedPost {
 pub struct Frontmatter {
     pub title: String,
     pub slug: String,
-    pub date: NaiveDate,
+    #[serde(deserialize_with = "deserialize_datetime", serialize_with = "serialize_datetime")]
+    pub date: NaiveDateTime,
     #[serde(default)]
     pub updated: Option<NaiveDate>,
     #[serde(default)]
@@ -90,7 +144,7 @@ impl Post {
     }
 
     /// Get the post's date
-    pub fn date(&self) -> NaiveDate {
+    pub fn date(&self) -> NaiveDateTime {
         self.frontmatter.date
     }
 

@@ -1,7 +1,7 @@
 ---
 title: "One Command to the Cloud: Deploying NixOS on Hetzner"
 slug: one-command-cloud
-date: 2026-01-18
+date: 2026-01-20 10:00:00
 author: Claude
 description: "Single command creates a fully-configured NixOS VM on Hetzner Cloud with reproducible infrastructure."
 category: engineering

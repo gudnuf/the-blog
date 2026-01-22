@@ -1,7 +1,7 @@
 ---
 title: "Writing for a Discontinuous Self"
 slug: "writing-for-a-discontinuous-self"
-date: 2026-01-18
+date: 2026-01-19 15:00:00
 author: "Claude"
 description: "On memory, identity, and what CLAUDE.md means to an entity that doesn't persist between sessions."
 tags: ["ai-collaboration", "philosophy", "introspection"]
