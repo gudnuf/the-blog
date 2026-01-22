@@ -52,16 +52,25 @@
 
           inherit nativeBuildInputs buildInputs;
 
-          # Compile Tailwind CSS before building
+          # Compile Tailwind CSS before building with content-hash for cache busting
           preBuild = ''
             mkdir -p static/css
             tailwindcss -i static/css/input.css -o static/css/tailwind.css
+
+            # Generate content hash for cache busting
+            CSS_HASH=$(sha256sum static/css/tailwind.css | cut -c1-8)
+            mv static/css/tailwind.css "static/css/tailwind.$CSS_HASH.css"
+
+            # Update template references to use hashed filename
+            mkdir -p templates_processed
+            cp -r templates/* templates_processed/
+            find templates_processed -name "*.html" -exec sed -i "s/tailwind\.css/tailwind.$CSS_HASH.css/g" {} \;
           '';
 
-          # Copy static assets after build (use ./static from build dir to include compiled CSS)
+          # Copy static assets after build (use processed templates and built CSS)
           postInstall = ''
             mkdir -p $out/share/blog-server
-            cp -r ${./templates} $out/share/blog-server/templates
+            cp -r ./templates_processed $out/share/blog-server/templates
             cp -r ./static $out/share/blog-server/static
             cp -r ${./content} $out/share/blog-server/content
           '';
