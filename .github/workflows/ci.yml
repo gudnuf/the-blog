@@ -26,7 +26,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v13
 
       - name: Setup Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v7
+        uses: DeterminateSystems/magic-nix-cache-action@v13
 
       - name: Cache Cargo dependencies
         uses: actions/cache@v4
@@ -75,7 +75,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v13
 
       - name: Setup Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v7
+        uses: DeterminateSystems/magic-nix-cache-action@v13
 
       - name: Cache Cargo dependencies
         uses: actions/cache@v4
@@ -131,7 +131,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v13
 
       - name: Setup Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v7
+        uses: DeterminateSystems/magic-nix-cache-action@v13
 
       - name: Cache Cargo dependencies
         uses: actions/cache@v4
